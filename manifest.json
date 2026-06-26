@@ -1,16 +1,16 @@
 {
   "id": "/",
-  "name": "Galactic Lottery - Euromillions & Loto",
+  "name": "Galactic Lottery",
   "short_name": "Galactic Lottery",
-  "description": "Application indépendante de génération de grilles Euromillions et Loto, avec favoris, statistiques internes, rappels et mode chuchotement. Non officielle FDJ. Aucun gain garanti.",
+  "description": "Application indépendante Euromillions et Loto avec générateur, timer, favoris, résultats, chaud/froid et Premium.",
   "lang": "fr-FR",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait",
-  "theme_color": "#14002f",
-  "background_color": "#05000d",
+  "theme_color": "#080010",
+  "background_color": "#080010",
   "categories": ["games", "utilities", "entertainment"],
   "icons": [
     {
@@ -34,10 +34,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Chuchoter une grille",
-      "short_name": "Chuchoter",
-      "description": "Ouvrir Galactic Lottery pour générer une grille rapide",
-      "url": "/#whisper",
+      "name": "Générer une grille",
+      "short_name": "Générer",
+      "description": "Ouvrir le générateur Galactic Lottery",
+      "url": "/#generator",
       "icons": [
         {
           "src": "/icon-192.png",
@@ -46,22 +46,10 @@
       ]
     },
     {
-      "name": "Mode Euromillions",
-      "short_name": "Euromillions",
-      "description": "Ouvrir Galactic Lottery en mode Euromillions",
-      "url": "/?mode=euromillions",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Mode Loto",
-      "short_name": "Loto",
-      "description": "Ouvrir Galactic Lottery en mode Loto",
-      "url": "/?mode=loto",
+      "name": "Premium",
+      "short_name": "Premium",
+      "description": "Ouvrir le mode Premium",
+      "url": "/#premium",
       "icons": [
         {
           "src": "/icon-192.png",
