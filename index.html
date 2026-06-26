@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#14002f" />
-  <meta name="description" content="Galactic Lottery : générateur indépendant de grilles Euromillions et Loto. Aucun gain garanti." />
+  <meta name="theme-color" content="#080010" />
+  <meta name="description" content="Galactic Lottery : générateur indépendant Euromillions et Loto avec timer, favoris, résultats, stats chaud/froid et mode Premium." />
 
   <title>Galactic Lottery</title>
 
@@ -13,319 +13,238 @@
 
   <style>
     :root {
-      --bg: #05000d;
-      --bg2: #13002f;
-      --card: rgba(255,255,255,0.085);
-      --card2: rgba(255,255,255,0.13);
-      --line: rgba(255,255,255,0.16);
-      --text: #fff;
-      --muted: rgba(255,255,255,0.72);
-      --soft: rgba(255,255,255,0.52);
-      --cyan: #36f5ff;
-      --green: #68ffbc;
-      --pink: #ff4ecd;
-      --gold: #ffd166;
-      --danger: #ff5c7c;
-      --radius: 26px;
-      --shadow: 0 24px 80px rgba(0,0,0,0.42);
+      --bg: #07000f;
+      --card: rgba(255,255,255,0.055);
+      --card2: rgba(255,255,255,0.09);
+      --line: rgba(142,82,255,0.28);
+      --text: #f5eeff;
+      --muted: rgba(245,238,255,0.68);
+      --soft: rgba(245,238,255,0.38);
+      --gold: #f4c84a;
+      --blue: #0060ff;
+      --red: #e21b16;
+      --violet: #8a4dff;
+      --green: #50ffb6;
+      --danger: #ff5577;
+      --shadow: 0 24px 85px rgba(0,0,0,0.55);
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
 
     html {
-      min-height: 100%;
       background: var(--bg);
       scroll-behavior: smooth;
     }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 18% 0%, rgba(255,78,205,0.28), transparent 30%),
-        radial-gradient(circle at 85% 8%, rgba(255,209,102,0.24), transparent 24%),
-        radial-gradient(circle at 50% 55%, rgba(54,245,255,0.12), transparent 38%),
-        linear-gradient(155deg, #030109 0%, #100020 48%, #210044 100%);
       overflow-x: hidden;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(142,82,255,0.23), transparent 34%),
+        radial-gradient(circle at 82% 8%, rgba(244,200,74,0.13), transparent 28%),
+        radial-gradient(circle at 45% 80%, rgba(0,96,255,0.12), transparent 42%),
+        linear-gradient(180deg, #05000b, #11001e 55%, #05000b);
     }
 
-    body::before {
-      content: "";
+    .stars {
       position: fixed;
       inset: 0;
+      z-index: 0;
       pointer-events: none;
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,0.65) 1px, transparent 1px),
-        radial-gradient(circle, rgba(54,245,255,0.35) 1px, transparent 1px);
-      background-size: 62px 62px, 112px 112px;
-      background-position: 0 0, 22px 35px;
-      opacity: 0.14;
-      mask-image: linear-gradient(to bottom, #000, transparent 90%);
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      animation: twinkle var(--d, 3s) infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.12; transform: scale(1); }
+      to { opacity: 0.95; transform: scale(1.45); }
     }
 
     .app {
       position: relative;
-      width: min(1120px, 100%);
+      z-index: 1;
+      width: min(620px, 100%);
       margin: 0 auto;
-      padding: 14px 12px 145px;
+      padding: 18px 13px 128px;
     }
 
-    .hero,
-    .card {
-      border: 1px solid var(--line);
-      background:
-        radial-gradient(circle at top right, rgba(255,209,102,0.12), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(54,245,255,0.09), transparent 32%),
-        linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.045));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-    }
-
-    .hero {
-      overflow: hidden;
-      border-radius: 34px;
-      padding: 20px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
+    .header {
+      text-align: center;
+      padding: 10px 0 18px;
     }
 
     .logo {
-      width: 56px;
-      height: 56px;
-      flex: 0 0 56px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      background:
-        radial-gradient(circle at 30% 25%, #fff 0%, #ffe693 13%, #ff4ecd 34%, #7336ff 62%, #13002f 100%);
-      box-shadow:
-        0 0 32px rgba(255,78,205,0.46),
-        inset 0 0 18px rgba(255,255,255,0.26);
+      font-size: 60px;
+      display: block;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 24px rgba(244,200,74,0.65));
+      animation: float 4s ease-in-out infinite;
     }
 
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
 
-    .brand-title {
-      margin: 0;
-      font-size: clamp(1.35rem, 5vw, 2.25rem);
+    h1 {
+      font-size: clamp(1.9rem, 7vw, 3rem);
       line-height: 1;
-      letter-spacing: -0.05em;
-    }
-
-    .brand-sub {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.35;
-    }
-
-    .install-top {
-      border: 0;
-      border-radius: 999px;
-      padding: 11px 14px;
-      color: #10001e;
+      letter-spacing: 4px;
+      color: var(--gold);
       font-weight: 950;
-      background: linear-gradient(135deg, var(--cyan), var(--gold));
-      cursor: pointer;
-      white-space: nowrap;
+      text-shadow: 0 0 26px rgba(244,200,74,0.25);
     }
 
-    .headline {
-      margin: 22px 0 0;
-      font-size: clamp(2.3rem, 10vw, 5.1rem);
-      line-height: 0.92;
-      letter-spacing: -0.08em;
+    .subtitle {
+      margin-top: 8px;
+      color: var(--violet);
+      letter-spacing: 4px;
+      font-weight: 850;
+      font-size: 0.76rem;
+      text-transform: uppercase;
     }
 
-    .headline span {
-      background: linear-gradient(135deg, #fff, var(--cyan), var(--pink), var(--gold));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .intro {
-      margin: 18px 0 0;
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.55;
-      max-width: 760px;
-    }
-
-    .warning {
-      margin-top: 18px;
+    .top-actions {
+      margin-top: 14px;
       display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 14px;
-      border: 1px solid rgba(255,209,102,0.32);
-      border-radius: 20px;
-      background: rgba(255,209,102,0.08);
-      color: rgba(255,255,255,0.86);
-      line-height: 1.45;
-      font-size: 0.94rem;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
     }
 
-    .mode-switch {
+    .pill-btn,
+    .btn,
+    .tab,
+    .nav-btn,
+    .small-btn {
+      cursor: pointer;
+      border: 0;
+      font: inherit;
+    }
+
+    .pill-btn {
+      border-radius: 999px;
+      padding: 10px 13px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .pill-btn.gold {
+      color: #140700;
+      background: linear-gradient(135deg, var(--gold), #fff0a8);
+      border: 0;
+    }
+
+    .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 18px;
+      gap: 8px;
+      padding: 6px;
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
     }
 
-    .mode-btn {
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 20px;
-      padding: 15px 12px;
-      color: var(--text);
-      background: rgba(255,255,255,0.08);
+    .tab {
+      border-radius: 13px;
+      padding: 14px 9px;
+      background: transparent;
+      color: rgba(245,238,255,0.42);
       font-weight: 950;
-      cursor: pointer;
+      letter-spacing: 1px;
     }
 
-    .mode-btn.active {
-      background:
-        linear-gradient(135deg, rgba(54,245,255,0.25), rgba(255,78,205,0.22)),
-        rgba(255,255,255,0.10);
-      border-color: rgba(255,255,255,0.36);
-      box-shadow: 0 0 28px rgba(54,245,255,0.14);
+    .tab.active.euro {
+      color: var(--gold);
+      background: linear-gradient(135deg, #001b73, #0060ff);
+      box-shadow: 0 0 24px rgba(0,96,255,0.42);
     }
 
-    .dash {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .dash-item {
-      border: 1px solid rgba(255,255,255,0.13);
-      border-radius: 22px;
-      padding: 15px;
-      background: rgba(0,0,0,0.20);
-      min-height: 94px;
-    }
-
-    .dash-item small {
-      color: var(--soft);
-      display: block;
-      font-weight: 750;
-      margin-bottom: 7px;
-    }
-
-    .dash-item strong {
-      font-size: 1.7rem;
-      display: block;
-      line-height: 1.05;
-    }
-
-    .layout {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: 1fr 0.88fr;
-      gap: 16px;
-      align-items: start;
+    .tab.active.loto {
+      color: #ffe7a6;
+      background: linear-gradient(135deg, #770000, #e21b16);
+      box-shadow: 0 0 24px rgba(226,27,22,0.40);
     }
 
     .card {
-      border-radius: var(--radius);
+      margin-bottom: 14px;
       padding: 18px;
-      margin-bottom: 16px;
-      scroll-margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(13px);
+      scroll-margin-top: 15px;
     }
 
-    .section-title {
+    .card-title {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin: 0 0 13px;
-      font-size: 1.35rem;
-      letter-spacing: -0.035em;
+      align-items: flex-start;
+      margin-bottom: 14px;
     }
 
-    .section-title small {
+    .card-title h2 {
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-title small {
       color: var(--soft);
-      font-size: 0.82rem;
-      font-weight: 800;
       text-align: right;
-      letter-spacing: 0;
+      font-weight: 850;
+      line-height: 1.35;
     }
 
-    .jackpot {
-      display: grid;
-      gap: 12px;
-    }
-
-    .jackpot-box {
-      border: 1px solid rgba(255,209,102,0.25);
-      border-radius: 24px;
-      padding: 18px;
-      background:
-        radial-gradient(circle at 78% 20%, rgba(255,209,102,0.24), transparent 34%),
-        rgba(0,0,0,0.18);
+    .timer-box {
       text-align: center;
-    }
-
-    .jackpot-box small {
-      color: var(--muted);
-      font-weight: 800;
-    }
-
-    .jackpot-box strong {
-      display: block;
-      margin-top: 4px;
-      font-size: clamp(2rem, 10vw, 4rem);
-      letter-spacing: -0.07em;
-      color: var(--gold);
-      line-height: 0.95;
-    }
-
-    .whisper {
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 24px;
-      padding: 16px;
+      padding: 18px 12px;
+      border: 1px solid rgba(244,200,74,0.22);
+      border-radius: 20px;
       background:
-        radial-gradient(circle at top left, rgba(255,78,205,0.16), transparent 38%),
+        radial-gradient(circle at top right, rgba(244,200,74,0.13), transparent 38%),
         rgba(0,0,0,0.20);
     }
 
-    .whisper-text {
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(1.15rem, 5vw, 1.65rem);
-      line-height: 1.55;
-      color: rgba(255,255,255,0.92);
-      white-space: pre-line;
-      margin: 0;
+    .timer-label {
+      color: var(--soft);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.72rem;
+      font-weight: 850;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .timer {
+      margin-top: 7px;
+      font-size: clamp(2rem, 10vw, 3.4rem);
+      line-height: 1;
+      font-weight: 950;
+      color: var(--gold);
+      letter-spacing: -0.05em;
+    }
+
+    .timer-note {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.88rem;
     }
 
     label {
@@ -333,285 +252,363 @@
       gap: 7px;
       color: var(--muted);
       font-weight: 850;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
+      margin-top: 12px;
     }
 
     input,
-    select,
     textarea {
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 18px;
+      padding: 13px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.12);
       background: rgba(0,0,0,0.25);
       color: var(--text);
-      padding: 14px 15px;
-      font: inherit;
-      font-weight: 780;
       outline: none;
+      font: inherit;
+      font-weight: 750;
     }
 
     textarea {
+      min-height: 74px;
       resize: vertical;
-      min-height: 78px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(54,245,255,0.65);
-      box-shadow: 0 0 0 4px rgba(54,245,255,0.10);
+    .balls-area {
+      padding: 18px 6px 6px;
     }
 
-    .actions {
+    .balls-row {
       display: flex;
+      justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .ball {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 950;
+      font-size: 1rem;
+      color: #fff;
+      transform: scale(0);
+      opacity: 0;
+      transition: 0.38s cubic-bezier(0.34,1.56,0.64,1);
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.27), rgba(0,0,0,0.45));
+      border: 2px solid rgba(255,255,255,0.17);
+    }
+
+    .ball.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .euro .ball.main {
+      color: #62a7ff;
+      box-shadow: 0 0 22px rgba(0,96,255,0.60);
+    }
+
+    .loto .ball.main {
+      color: #ff7979;
+      box-shadow: 0 0 22px rgba(226,27,22,0.55);
+    }
+
+    .ball.extra {
+      width: 48px;
+      height: 48px;
+      color: var(--gold);
+      border-color: rgba(244,200,74,0.62);
+      background: radial-gradient(circle at 35% 30%, rgba(255,236,133,0.45), rgba(110,72,0,0.42));
+      box-shadow: 0 0 18px rgba(244,200,74,0.42);
+    }
+
+    .loto .ball.extra {
+      color: #ff9a9a;
+      border-color: rgba(255,90,90,0.62);
+      background: radial-gradient(circle at 35% 30%, rgba(255,100,100,0.45), rgba(110,0,0,0.42));
+      box-shadow: 0 0 18px rgba(226,27,22,0.35);
+    }
+
+    .extra-label {
+      text-align: center;
+      color: var(--soft);
+      font-size: 0.72rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 6px 0 10px;
+    }
+
+    .analysis {
+      display: none;
       margin-top: 14px;
+      padding: 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(142,82,255,0.28);
+      background: rgba(142,82,255,0.09);
+    }
+
+    .analysis.show {
+      display: block;
+    }
+
+    .analysis small {
+      display: block;
+      color: var(--violet);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .analysis p {
+      color: rgba(245,238,255,0.78);
+      line-height: 1.55;
+      font-style: italic;
     }
 
     .btn {
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 18px;
-      padding: 13px 15px;
+      width: 100%;
+      padding: 15px 14px;
+      border-radius: 16px;
       color: var(--text);
-      background: rgba(255,255,255,0.08);
       font-weight: 950;
-      cursor: pointer;
+      letter-spacing: 1px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.13);
     }
 
-    .btn.primary {
-      color: #060014;
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      box-shadow: 0 14px 30px rgba(54,245,255,0.18);
+    .btn.primary.euro {
+      color: var(--gold);
+      background: linear-gradient(135deg, #001f80, #0060ff);
+      border-color: rgba(0,96,255,0.4);
+      box-shadow: 0 0 32px rgba(0,96,255,0.35);
+    }
+
+    .btn.primary.loto {
+      color: #ffe7a6;
+      background: linear-gradient(135deg, #7b0000, #e21b16);
+      border-color: rgba(226,27,22,0.4);
+      box-shadow: 0 0 32px rgba(226,27,22,0.34);
     }
 
     .btn.gold {
-      color: #160900;
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--gold), #fff1b5);
+      color: #160800;
+      background: linear-gradient(135deg, var(--gold), #fff0a8);
+      border: 0;
     }
 
     .btn.danger {
       color: #fff;
-      border-color: rgba(255,92,124,0.35);
-      background: rgba(255,92,124,0.18);
+      background: rgba(255,85,119,0.16);
+      border-color: rgba(255,85,119,0.34);
     }
 
-    .btn:active,
-    .mode-btn:active,
-    .nav-btn:active,
-    .small-btn:active {
-      transform: scale(0.98);
-    }
-
-    .results,
-    .stats-list,
-    .reminder-list {
+    .btn-grid {
       display: grid;
-      gap: 12px;
-      margin-top: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
     }
 
-    .grid-card {
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 24px;
-      padding: 15px;
-      background:
-        radial-gradient(circle at top left, rgba(54,245,255,0.13), transparent 34%),
-        rgba(0,0,0,0.22);
+    .premium-lock {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(244,200,74,0.25);
+      background: rgba(244,200,74,0.07);
     }
 
-    .grid-card.favorite {
-      border-color: rgba(255,209,102,0.35);
-      background:
-        radial-gradient(circle at top left, rgba(255,209,102,0.15), transparent 34%),
-        rgba(0,0,0,0.22);
+    .premium-ok {
+      display: none;
     }
 
-    .grid-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+    body.premium .premium-lock {
+      display: none;
     }
 
-    .grid-title {
-      margin: 0;
-      font-size: 1rem;
+    body.premium .premium-ok {
+      display: block;
     }
 
-    .grid-meta {
+    .stats-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 17px;
+      padding: 13px;
+      background: rgba(0,0,0,0.20);
+    }
+
+    .stat-box small {
+      display: block;
       color: var(--soft);
-      font-size: 0.82rem;
-      font-weight: 750;
-      margin-top: 4px;
-    }
-
-    .balls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 9px 0 11px;
-    }
-
-    .ball {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      color: #080014;
-      background: linear-gradient(135deg, #fff, #c8fbff);
-      font-weight: 1000;
-      box-shadow: inset 0 -8px 16px rgba(0,0,0,0.16), 0 8px 18px rgba(0,0,0,0.22);
-    }
-
-    .ball.bonus {
-      background: linear-gradient(135deg, var(--gold), #fff5c9);
-      color: #170900;
-    }
-
-    .grid-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 11px;
-    }
-
-    .small-btn {
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 9px 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 0.68rem;
       font-weight: 900;
-      cursor: pointer;
-      font-size: 0.83rem;
+      margin-bottom: 6px;
     }
 
-    .small-btn.warn {
-      border-color: rgba(255,92,124,0.35);
-      color: #ffd7de;
-    }
-
-    .empty {
-      border: 1px dashed rgba(255,255,255,0.19);
-      border-radius: 22px;
-      padding: 17px;
-      color: var(--soft);
-      text-align: center;
-      line-height: 1.45;
-      background: rgba(255,255,255,0.035);
-    }
-
-    .stat-row {
-      display: grid;
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
       gap: 7px;
     }
 
-    .stat-label {
+    .chip {
+      min-width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      padding: 0 9px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 0.82rem;
+    }
+
+    .chip.hot {
+      color: #ffd1d1;
+      border-color: rgba(226,27,22,0.40);
+      background: rgba(226,27,22,0.15);
+    }
+
+    .chip.cold {
+      color: #cfe3ff;
+      border-color: rgba(0,96,255,0.40);
+      background: rgba(0,96,255,0.14);
+    }
+
+    .list {
+      display: grid;
+      gap: 9px;
+      margin-top: 11px;
+    }
+
+    .item {
+      padding: 11px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .item-top {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 800;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
     }
 
-    .bar {
-      height: 10px;
-      overflow: hidden;
+    .item-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+    }
+
+    .small-btn {
       border-radius: 999px;
-      background: rgba(255,255,255,0.08);
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text);
+      font-weight: 850;
+      font-size: 0.78rem;
     }
 
-    .bar span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--cyan), var(--pink), var(--gold));
+    .small-btn.danger {
+      color: #ffd1dc;
+      border-color: rgba(255,85,119,0.34);
+      background: rgba(255,85,119,0.12);
     }
 
-    .status-line {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.5;
-      margin-bottom: 0;
-    }
-
-    .reminder-item {
-      border: 1px solid rgba(255,255,255,0.13);
-      border-radius: 20px;
-      padding: 13px;
-      background: rgba(255,255,255,0.055);
-    }
-
-    .reminder-item.done {
-      opacity: 0.58;
-    }
-
-    .reminder-item strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .reminder-item small {
+    .empty {
+      text-align: center;
+      padding: 13px 8px;
       color: var(--soft);
-      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .result-status {
+      font-weight: 950;
+    }
+
+    .result-status.win {
+      color: var(--green);
+    }
+
+    .result-status.lose {
+      color: var(--danger);
+    }
+
+    .notice {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-top: 10px;
     }
 
     .bottom-nav {
       position: fixed;
       left: 50%;
-      bottom: calc(12px + env(safe-area-inset-bottom));
+      bottom: calc(10px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
-      width: min(640px, calc(100% - 24px));
       z-index: 30;
+      width: min(580px, calc(100% - 22px));
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 9px;
-      border: 1px solid rgba(255,255,255,0.16);
-      border-radius: 25px;
-      background: rgba(8,0,24,0.86);
+      gap: 7px;
+      padding: 8px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(7,0,18,0.92);
       backdrop-filter: blur(20px);
-      box-shadow: 0 18px 55px rgba(0,0,0,0.48);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.55);
     }
 
     .nav-btn {
-      border: 0;
-      border-radius: 18px;
-      padding: 11px 6px;
+      padding: 10px 4px;
+      border-radius: 15px;
       background: transparent;
-      color: rgba(255,255,255,0.72);
+      color: rgba(245,238,255,0.58);
       font-weight: 950;
-      cursor: pointer;
-      font-size: 0.81rem;
+      font-size: 0.74rem;
     }
 
     .nav-btn.active {
-      color: #080014;
-      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      color: #160800;
+      background: linear-gradient(135deg, var(--gold), #fff0a8);
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(100px + env(safe-area-inset-bottom));
-      transform: translateX(-50%) translateY(20px);
-      z-index: 50;
-      width: min(520px, calc(100% - 28px));
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 18px;
+      bottom: calc(92px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(18px);
+      z-index: 60;
+      width: min(520px, calc(100% - 26px));
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 17px;
       padding: 13px 14px;
-      background: rgba(8,0,22,0.94);
-      box-shadow: 0 18px 50px rgba(0,0,0,0.45);
       color: var(--text);
+      background: rgba(7,0,18,0.96);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
       opacity: 0;
       pointer-events: none;
       transition: 0.24s ease;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .toast.show {
@@ -619,383 +616,338 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
+    .disclaimer {
+      text-align: center;
+      color: rgba(245,238,255,0.34);
+      font-size: 0.76rem;
+      line-height: 1.6;
+      padding: 8px 14px 0;
     }
 
-    @media (max-width: 620px) {
+    .disclaimer strong {
+      color: var(--gold);
+    }
+
+    @media (max-width: 430px) {
       .app {
-        padding: 10px 9px 150px;
-      }
-
-      .hero,
-      .card {
-        border-radius: 25px;
-      }
-
-      .hero {
-        padding: 17px;
-      }
-
-      .install-top {
-        padding: 10px 12px;
-        font-size: 0.84rem;
-      }
-
-      .dash {
-        grid-template-columns: 1fr;
-      }
-
-      .dash-item {
-        min-height: 82px;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .section-title {
-        font-size: 1.25rem;
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       .ball {
-        width: 39px;
-        height: 39px;
+        width: 48px;
+        height: 48px;
       }
 
-      .btn {
-        flex: 1 1 auto;
+      .ball.extra {
+        width: 44px;
+        height: 44px;
+      }
+
+      .btn-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        letter-spacing: 2px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <header class="hero" id="top">
-      <div class="topbar">
-        <div class="brand">
-          <div class="logo">✦</div>
-          <div>
-            <h1 class="brand-title">Galactic Lottery</h1>
-            <p class="brand-sub">Euromillions & Loto — générateur indépendant</p>
-          </div>
-        </div>
+  <div class="stars" id="stars"></div>
 
-        <button class="install-top" id="installBtn">Installer</button>
-      </div>
+  <main class="app">
+    <header class="header" id="top">
+      <span class="logo">🦁</span>
+      <h1>GALACTIC LOTTERY</h1>
+      <div class="subtitle">Free · Premium · Timer · Stats</div>
 
-      <h2 class="headline">Grilles <span>cosmiques</span>, sans promesse.</h2>
-
-      <p class="intro">
-        Génère des grilles aléatoires, garde tes favoris, consulte tes statistiques internes
-        et prépare tes rappels. Application indépendante, non officielle, pensée pour mobile.
-      </p>
-
-      <div class="warning">
-        <span>⚠️</span>
-        <span>
-          Galactic Lottery n’est pas affiliée à la FDJ. Les grilles sont générées aléatoirement.
-          Aucun résultat, score ou algorithme ne garantit un gain.
-        </span>
-      </div>
-
-      <div class="mode-switch">
-        <button class="mode-btn active" data-mode="euromillions">Euromillions</button>
-        <button class="mode-btn" data-mode="loto">Loto</button>
-      </div>
-
-      <div class="dash">
-        <div class="dash-item">
-          <small>Grilles générées</small>
-          <strong id="countHistory">0</strong>
-        </div>
-        <div class="dash-item">
-          <small>Favoris sauvegardés</small>
-          <strong id="countFavorites">0</strong>
-        </div>
-        <div class="dash-item">
-          <small>Mode actif</small>
-          <strong id="activeModeLabel">Euromillions</strong>
-        </div>
+      <div class="top-actions">
+        <button class="pill-btn gold" id="installBtn">Installer</button>
+        <button class="pill-btn" id="premiumTopBtn">Premium</button>
       </div>
     </header>
 
-    <main class="layout">
-      <section>
-        <div class="card" id="whisper">
-          <h2 class="section-title">
-            Chuchotement galactique
-            <small>Grille rapide</small>
-          </h2>
+    <section class="tabs">
+      <button class="tab active euro" id="tabEuro">⭐ EuroMillions</button>
+      <button class="tab" id="tabLoto">🎱 Loto</button>
+    </section>
 
-          <div class="whisper">
-            <p class="whisper-text" id="whisperText">chuchote très fort...
+    <section class="card" id="timerSection">
+      <div class="card-title">
+        <h2>⏳ Timer tirage</h2>
+        <small id="drawGameLabel">EuroMillions</small>
+      </div>
 
-ok ok... 🤫
+      <div class="timer-box">
+        <div class="timer-label">Temps restant indicatif</div>
+        <div class="timer" id="countdown">--:--:--</div>
+        <p class="timer-note" id="nextDrawText">Calcul du prochain tirage…</p>
+      </div>
 
-Appuie sur le bouton pour recevoir une grille au hasard.
+      <label>
+        Modifier l’heure du tirage
+        <input type="datetime-local" id="drawInput" />
+      </label>
 
-Aucun gain garanti.</p>
-          </div>
+      <div class="btn-grid">
+        <button class="btn gold" id="saveDrawBtn">Enregistrer timer</button>
+        <button class="btn" id="resetDrawBtn">Auto</button>
+      </div>
 
-          <div class="actions">
-            <button class="btn primary" id="whisperBtn">🤫 Chuchote-moi une grille</button>
-            <button class="btn gold" id="saveWhisperBtn">⭐ Ajouter aux favoris</button>
-            <button class="btn" id="copyWhisperBtn">Copier</button>
-          </div>
+      <p class="notice">
+        Le timer est pratique avant d’aller jouer, mais vérifie toujours l’heure officielle avant validation.
+      </p>
+    </section>
+
+    <section class="card" id="generator">
+      <div class="card-title">
+        <h2>🔮 Générateur Free</h2>
+        <small id="generatorLabel">5 numéros + 2 étoiles</small>
+      </div>
+
+      <div class="balls-area" id="ballsArea">
+        <div class="balls-row" id="mainBalls"></div>
+        <div class="extra-label" id="extraLabel">Étoiles</div>
+        <div class="balls-row" id="extraBalls"></div>
+      </div>
+
+      <div class="analysis" id="analysis">
+        <small id="analysisTitle">Analyse</small>
+        <p id="analysisText"></p>
+      </div>
+    </section>
+
+    <button class="btn primary euro" id="generateBtn">🎲 Générer une grille Free</button>
+
+    <div class="btn-grid">
+      <button class="btn gold" id="saveCurrentBtn">⭐ Favori</button>
+      <button class="btn" id="copyCurrentBtn">Copier</button>
+    </div>
+
+    <section class="card" id="premium">
+      <div class="card-title">
+        <h2>👑 Premium</h2>
+        <small>Code : galactic2026</small>
+      </div>
+
+      <div class="premium-lock">
+        <p class="notice" style="margin-top:0;">
+          Débloque le mode Premium pour retrouver les stats chaud/froid, score statistique,
+          équilibre pair/impair, petits/grands numéros et génération avancée.
+        </p>
+
+        <label>
+          Code Premium
+          <input id="premiumCode" placeholder="Entre le code premium" />
+        </label>
+
+        <button class="btn gold" id="unlockBtn">Débloquer Premium</button>
+      </div>
+
+      <div class="premium-ok">
+        <p class="notice" style="margin-top:0;color:var(--green);font-weight:850;">
+          Premium activé ✅
+        </p>
+
+        <div class="btn-grid">
+          <button class="btn gold" id="premiumGenerateBtn">Générer Premium</button>
+          <button class="btn" id="premiumBatchBtn">5 grilles Premium</button>
         </div>
 
-        <div class="card" id="generator">
-          <h2 class="section-title">
-            Générateur
-            <small id="generatorHelp">5 numéros + 2 étoiles</small>
-          </h2>
+        <div class="stats-grid" id="premiumStats"></div>
+      </div>
+    </section>
 
-          <div class="form-grid">
-            <label>
-              Nombre de grilles
-              <select id="gridCount">
-                <option value="1">1 grille</option>
-                <option value="3">3 grilles</option>
-                <option value="5" selected>5 grilles</option>
-                <option value="10">10 grilles</option>
-              </select>
-            </label>
+    <section class="card" id="stats">
+      <div class="card-title">
+        <h2>🔥 Chaud / Froid</h2>
+        <small>Selon tes données</small>
+      </div>
 
-            <label>
-              Nom de session
-              <input id="sessionName" maxlength="40" placeholder="Ex : Tirage du soir" />
-            </label>
-          </div>
-
-          <div class="actions">
-            <button class="btn primary" id="generateBtn">Générer</button>
-            <button class="btn gold" id="saveAllBtn">Tout mettre en favoris</button>
-            <button class="btn" id="clearGeneratedBtn">Effacer l’écran</button>
-          </div>
-
-          <div class="results" id="generatedList"></div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <small>Numéros chauds</small>
+          <div class="chip-row" id="hotNumbers"></div>
         </div>
 
-        <div class="card" id="favorites">
-          <h2 class="section-title">
-            Favoris
-            <small>Stockés sur ton téléphone</small>
-          </h2>
-
-          <div class="actions">
-            <button class="btn" id="exportBtn">Exporter</button>
-            <button class="btn danger" id="clearFavoritesBtn">Vider les favoris</button>
-          </div>
-
-          <div class="results" id="favoritesList"></div>
+        <div class="stat-box">
+          <small>Numéros froids</small>
+          <div class="chip-row" id="coldNumbers"></div>
         </div>
-      </section>
+      </div>
 
-      <aside>
-        <div class="card" id="jackpot">
-          <h2 class="section-title">
-            Jackpot galactique
-            <small>Non officiel</small>
-          </h2>
+      <p class="notice" id="statsSource">
+        Les numéros chauds/froids sont calculés avec tes résultats saisis et ton historique local.
+      </p>
+    </section>
 
-          <div class="jackpot">
-            <div class="jackpot-box">
-              <small>Montant réel à vérifier avant de jouer</small>
-              <strong id="jackpotAmount">À vérifier</strong>
-            </div>
+    <section class="card" id="results">
+      <div class="card-title">
+        <h2>🏆 Résultat</h2>
+        <small>Gagné ou pas gagné</small>
+      </div>
 
-            <p class="status-line">
-              Cette app n’affiche pas de données officielles en direct. Vérifie toujours le jackpot,
-              les horaires et les résultats sur une source officielle avant validation.
-            </p>
+      <label>
+        Numéros officiels
+        <input id="resultMain" placeholder="Ex : 7 13 24 38 49" />
+      </label>
 
-            <div class="actions">
-              <button class="btn gold" id="officialBtn">Vérifier le site officiel</button>
-            </div>
-          </div>
-        </div>
+      <label>
+        Étoiles / Chance
+        <input id="resultExtra" placeholder="Ex : 3 11" />
+      </label>
 
-        <div class="card" id="stats">
-          <h2 class="section-title">
-            Statistiques internes
-            <small>Basées sur tes grilles</small>
-          </h2>
+      <button class="btn gold" id="checkResultBtn">Contrôler mes grilles</button>
 
-          <p class="status-line">
-            Ces statistiques analysent uniquement les grilles générées et favorites dans l’application.
-            Elles ne représentent pas les résultats officiels.
-          </p>
+      <div class="list" id="resultList">
+        <div class="empty">Entre le résultat officiel après tirage pour vérifier tes grilles.</div>
+      </div>
 
-          <div class="actions">
-            <button class="btn" id="refreshStatsBtn">Actualiser</button>
-            <button class="btn danger" id="clearHistoryBtn">Effacer l’historique</button>
-          </div>
+      <p class="notice">
+        Contrôle indicatif. Pour un paiement ou une validation réelle, vérifie toujours sur le reçu ou la source officielle.
+      </p>
+    </section>
 
-          <div class="stats-list" id="statsList"></div>
-        </div>
+    <section class="card" id="history">
+      <div class="card-title">
+        <h2>📜 Historique</h2>
+        <small>Session locale</small>
+      </div>
 
-        <div class="card" id="reminders">
-          <h2 class="section-title">
-            Rappels
-            <small>Rappels locaux simples</small>
-          </h2>
+      <div class="list" id="historyList">
+        <div class="empty">Aucune grille générée.</div>
+      </div>
+    </section>
 
-          <div class="form-grid">
-            <label>
-              Date et heure
-              <input id="reminderDate" type="datetime-local" />
-            </label>
+    <section class="card" id="favorites">
+      <div class="card-title">
+        <h2>⭐ Favoris</h2>
+        <small>Sur ton téléphone</small>
+      </div>
 
-            <label>
-              Type
-              <select id="reminderMode">
-                <option value="euromillions">Euromillions</option>
-                <option value="loto">Loto</option>
-                <option value="custom">Autre rappel</option>
-              </select>
-            </label>
-          </div>
+      <div class="btn-grid">
+        <button class="btn" id="exportBtn">Exporter</button>
+        <button class="btn danger" id="clearFavBtn">Vider favoris</button>
+      </div>
 
-          <label style="margin-top:12px;">
-            Note
-            <textarea id="reminderNote" maxlength="140" placeholder="Ex : Penser à préparer mes grilles"></textarea>
-          </label>
+      <div class="list" id="favoritesList">
+        <div class="empty">Aucun favori.</div>
+      </div>
+    </section>
 
-          <div class="actions">
-            <button class="btn primary" id="addReminderBtn">Ajouter un rappel</button>
-            <button class="btn" id="permissionBtn">Activer notifications</button>
-          </div>
+    <section class="card" id="pwa">
+      <div class="card-title">
+        <h2>📱 PWA</h2>
+        <small>Installation</small>
+      </div>
 
-          <p class="status-line">
-            Les rappels fonctionnent lorsque l’application est ouverte ou relancée.
-            Les notifications Android en arrière-plan demandent plus tard un vrai système Push.
-          </p>
+      <p class="notice" id="pwaStatus">Vérification…</p>
+    </section>
 
-          <div class="reminder-list" id="reminderList"></div>
-        </div>
-
-        <div class="card" id="pwa">
-          <h2 class="section-title">
-            PWA
-            <small>Installation Android</small>
-          </h2>
-
-          <p class="status-line" id="pwaStatus">
-            Vérification de l’installation en cours…
-          </p>
-
-          <div class="actions">
-            <button class="btn primary" id="installBtn2">Installer l’app</button>
-            <button class="btn" id="copyUrlBtn">Copier le lien</button>
-            <button class="btn" id="reloadBtn">Recharger</button>
-          </div>
-        </div>
-      </aside>
-    </main>
-  </div>
+    <p class="disclaimer">
+      <strong>Galactic Lottery est indépendante et non affiliée à la FDJ.</strong><br>
+      Les grilles sont générées aléatoirement. Les analyses Premium sont statistiques et divertissantes.
+      Aucun score, IA, méthode ou algorithme ne garantit un gain.
+    </p>
+  </main>
 
   <nav class="bottom-nav">
     <button class="nav-btn active" data-target="top">Accueil</button>
-    <button class="nav-btn" data-target="whisper">Chuchoter</button>
-    <button class="nav-btn" data-target="generator">Générer</button>
+    <button class="nav-btn" data-target="premium">Premium</button>
+    <button class="nav-btn" data-target="results">Résultat</button>
     <button class="nav-btn" data-target="favorites">Favoris</button>
   </nav>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    const APP_VERSION = "1.1.0";
-    const STORAGE_KEY = "galacticLotteryStateV11";
+    const PREMIUM_CODE = "galactic2026";
+    const STORAGE_KEY = "galacticLotteryRecoveryPremiumV13";
+    const APP_VERSION = "1.3.0";
 
     const CONFIG = {
-      euromillions: {
-        label: "Euromillions",
+      euro: {
+        label: "EuroMillions",
         mainCount: 5,
         mainMax: 50,
-        bonusCount: 2,
-        bonusMax: 12,
-        bonusLabel: "Étoiles",
-        help: "5 numéros + 2 étoiles"
+        extraCount: 2,
+        extraMax: 12,
+        extraLabel: "Étoiles",
+        icon: "⭐",
+        drawDays: [2, 5],
+        hour: 20,
+        minute: 30
       },
       loto: {
         label: "Loto",
         mainCount: 5,
         mainMax: 49,
-        bonusCount: 1,
-        bonusMax: 10,
-        bonusLabel: "Chance",
-        help: "5 numéros + 1 numéro Chance"
+        extraCount: 1,
+        extraMax: 10,
+        extraLabel: "Numéro Chance",
+        icon: "🎱",
+        drawDays: [1, 3, 6],
+        hour: 20,
+        minute: 30
       }
     };
 
-    const DEFAULT_STATE = {
-      mode: "euromillions",
-      generated: [],
-      history: [],
-      favorites: [],
-      reminders: [],
-      whisperGrid: null
-    };
-
+    let game = "euro";
+    let currentGrid = null;
     let deferredInstallPrompt = null;
+
     let state = loadState();
 
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
-    const els = {
-      installBtn: $("#installBtn"),
-      installBtn2: $("#installBtn2"),
-      activeModeLabel: $("#activeModeLabel"),
-      countHistory: $("#countHistory"),
-      countFavorites: $("#countFavorites"),
-      generatorHelp: $("#generatorHelp"),
-      generatedList: $("#generatedList"),
-      favoritesList: $("#favoritesList"),
-      statsList: $("#statsList"),
-      reminderList: $("#reminderList"),
-      reminderDate: $("#reminderDate"),
-      reminderMode: $("#reminderMode"),
-      reminderNote: $("#reminderNote"),
-      whisperText: $("#whisperText"),
-      pwaStatus: $("#pwaStatus"),
-      toast: $("#toast")
-    };
-
     init();
 
     function init() {
-      applyModeFromUrl();
-      setDefaultReminderDate();
+      createStars();
       bindEvents();
+      applyPremiumState();
+      renderDefaultBalls();
+      setDrawInput();
+      renderAll();
+      startTimer();
       registerServiceWorker();
       initInstallPrompt();
-      renderAll();
-      checkDueReminders();
-      setInterval(checkDueReminders, 30000);
     }
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return clone(DEFAULT_STATE);
+        if (!raw) {
+          return {
+            premium: false,
+            history: [],
+            favorites: [],
+            results: [],
+            customDraws: {}
+          };
+        }
 
         const parsed = JSON.parse(raw);
 
         return {
-          ...clone(DEFAULT_STATE),
-          ...parsed,
-          generated: Array.isArray(parsed.generated) ? parsed.generated : [],
+          premium: Boolean(parsed.premium),
           history: Array.isArray(parsed.history) ? parsed.history : [],
           favorites: Array.isArray(parsed.favorites) ? parsed.favorites : [],
-          reminders: Array.isArray(parsed.reminders) ? parsed.reminders : []
+          results: Array.isArray(parsed.results) ? parsed.results : [],
+          customDraws: parsed.customDraws || {}
         };
       } catch {
-        return clone(DEFAULT_STATE);
+        return {
+          premium: false,
+          history: [],
+          favorites: [],
+          results: [],
+          customDraws: {}
+        };
       }
     }
 
@@ -1003,194 +955,343 @@ Aucun gain garanti.</p>
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function clone(value) {
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    function applyModeFromUrl() {
-      const params = new URLSearchParams(location.search);
-      const mode = params.get("mode");
-
-      if (CONFIG[mode]) {
-        state.mode = mode;
-        saveState();
-      }
-    }
-
     function bindEvents() {
-      $$(".mode-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-          state.mode = button.dataset.mode;
-          saveState();
-          renderAll();
-          toast(`Mode ${CONFIG[state.mode].label} activé.`);
-        });
-      });
-
-      $("#generateBtn").addEventListener("click", generateGrids);
-      $("#saveAllBtn").addEventListener("click", saveAllGenerated);
-      $("#clearGeneratedBtn").addEventListener("click", clearGenerated);
-      $("#clearFavoritesBtn").addEventListener("click", clearFavorites);
-      $("#clearHistoryBtn").addEventListener("click", clearHistory);
-      $("#refreshStatsBtn").addEventListener("click", renderStats);
+      $("#tabEuro").addEventListener("click", () => switchGame("euro"));
+      $("#tabLoto").addEventListener("click", () => switchGame("loto"));
+      $("#generateBtn").addEventListener("click", () => generateGrid("free"));
+      $("#saveCurrentBtn").addEventListener("click", saveCurrent);
+      $("#copyCurrentBtn").addEventListener("click", copyCurrent);
+      $("#unlockBtn").addEventListener("click", unlockPremium);
+      $("#premiumGenerateBtn").addEventListener("click", () => generateGrid("premium"));
+      $("#premiumBatchBtn").addEventListener("click", premiumBatch);
+      $("#checkResultBtn").addEventListener("click", checkResults);
       $("#exportBtn").addEventListener("click", exportFavorites);
-
-      $("#whisperBtn").addEventListener("click", whisperGrid);
-      $("#saveWhisperBtn").addEventListener("click", saveWhisper);
-      $("#copyWhisperBtn").addEventListener("click", copyWhisper);
-
-      $("#addReminderBtn").addEventListener("click", addReminder);
-      $("#permissionBtn").addEventListener("click", requestNotificationPermission);
-
-      $("#officialBtn").addEventListener("click", () => {
-        window.open("https://www.fdj.fr/jeux-de-tirage/euromillions-my-million", "_blank", "noopener,noreferrer");
-      });
-
-      $("#copyUrlBtn").addEventListener("click", copyUrl);
-      $("#reloadBtn").addEventListener("click", () => location.reload());
-
-      els.installBtn.addEventListener("click", installApp);
-      els.installBtn2.addEventListener("click", installApp);
+      $("#clearFavBtn").addEventListener("click", clearFavorites);
+      $("#saveDrawBtn").addEventListener("click", saveCustomDraw);
+      $("#resetDrawBtn").addEventListener("click", resetCustomDraw);
+      $("#installBtn").addEventListener("click", installApp);
+      $("#premiumTopBtn").addEventListener("click", () => scrollToId("premium"));
 
       $$(".nav-btn").forEach((button) => {
         button.addEventListener("click", () => {
-          const target = document.getElementById(button.dataset.target);
-          if (!target) return;
-
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-
+          scrollToId(button.dataset.target);
           $$(".nav-btn").forEach((item) => item.classList.remove("active"));
           button.classList.add("active");
         });
       });
     }
 
-    function renderAll() {
-      renderMode();
-      renderCounts();
-      renderWhisper();
-      renderGenerated();
-      renderFavorites();
-      renderStats();
-      renderReminders();
-      renderPwaStatus();
+    function createStars() {
+      const wrap = $("#stars");
+
+      for (let i = 0; i < 130; i++) {
+        const star = document.createElement("div");
+        const size = Math.random() * 2.5 + 0.5;
+
+        star.className = "star";
+        star.style.cssText = `
+          left:${Math.random() * 100}%;
+          top:${Math.random() * 100}%;
+          width:${size}px;
+          height:${size}px;
+          --d:${(Math.random() * 4 + 1).toFixed(1)}s;
+          animation-delay:${(Math.random() * 5).toFixed(1)}s;
+          opacity:${Math.random() * 0.5};
+        `;
+
+        wrap.appendChild(star);
+      }
     }
 
-    function renderMode() {
-      const config = CONFIG[state.mode];
+    function switchGame(nextGame) {
+      game = nextGame;
+      currentGrid = null;
 
-      $$(".mode-btn").forEach((button) => {
-        button.classList.toggle("active", button.dataset.mode === state.mode);
+      $("#tabEuro").className = "tab" + (game === "euro" ? " active euro" : "");
+      $("#tabLoto").className = "tab" + (game === "loto" ? " active loto" : "");
+
+      $("#generateBtn").className = `btn primary ${game}`;
+      $("#ballsArea").className = `balls-area ${game}`;
+
+      $("#analysis").classList.remove("show");
+
+      renderDefaultBalls();
+      setDrawInput();
+      renderAll();
+    }
+
+    function renderDefaultBalls() {
+      const config = CONFIG[game];
+
+      $("#mainBalls").innerHTML = "";
+      $("#extraBalls").innerHTML = "";
+
+      for (let i = 0; i < config.mainCount; i++) {
+        const ball = document.createElement("div");
+        ball.className = "ball main show";
+        ball.textContent = "?";
+        $("#mainBalls").appendChild(ball);
+      }
+
+      for (let i = 0; i < config.extraCount; i++) {
+        const ball = document.createElement("div");
+        ball.className = "ball extra show";
+        ball.textContent = "?";
+        $("#extraBalls").appendChild(ball);
+      }
+
+      $("#extraLabel").textContent = config.extraLabel;
+      $("#generatorLabel").textContent = `${config.mainCount} numéros + ${config.extraCount} ${config.extraLabel.toLowerCase()}`;
+      $("#drawGameLabel").textContent = config.label;
+    }
+
+    async function generateGrid(type) {
+      const config = CONFIG[game];
+      const button = type === "premium" ? $("#premiumGenerateBtn") : $("#generateBtn");
+
+      if (type === "premium" && !state.premium) {
+        toast("Débloque Premium avec le code.");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = type === "premium" ? "Calcul Premium…" : "Génération…";
+
+      $$(".ball").forEach((ball) => {
+        ball.classList.remove("show");
+        ball.textContent = "?";
       });
 
-      els.activeModeLabel.textContent = config.label;
-      els.generatorHelp.textContent = config.help;
-      els.reminderMode.value = state.mode;
-    }
+      await sleep(350);
 
-    function renderCounts() {
-      els.countHistory.textContent = state.history.length;
-      els.countFavorites.textContent = state.favorites.length;
-    }
+      const grid = type === "premium"
+        ? buildPremiumGrid()
+        : buildRandomGrid();
 
-    function generateGrids() {
-      const count = Number($("#gridCount").value) || 1;
-      const sessionName = $("#sessionName").value.trim();
-      const grids = [];
+      currentGrid = {
+        id: makeId(),
+        game,
+        type,
+        main: grid.main,
+        extra: grid.extra,
+        score: grid.score || scoreGrid(grid.main, grid.extra).score,
+        details: grid.details || scoreGrid(grid.main, grid.extra).details,
+        createdAt: new Date().toISOString()
+      };
 
-      for (let i = 0; i < count; i++) {
-        grids.push(createGrid(sessionName || "Tirage galactique"));
+      const mainBalls = $$("#mainBalls .ball");
+      const extraBalls = $$("#extraBalls .ball");
+
+      for (let i = 0; i < mainBalls.length; i++) {
+        await sleep(120);
+        mainBalls[i].textContent = currentGrid.main[i];
+        mainBalls[i].classList.add("show");
       }
 
-      state.generated = grids;
-      state.history = [...grids, ...state.history].slice(0, 400);
+      await sleep(180);
+
+      for (let i = 0; i < extraBalls.length; i++) {
+        await sleep(140);
+        extraBalls[i].textContent = currentGrid.extra[i];
+        extraBalls[i].classList.add("show");
+      }
+
+      showAnalysis(currentGrid);
+
+      state.history.unshift(currentGrid);
+      state.history = state.history.slice(0, 80);
       saveState();
+
       renderAll();
 
-      toast(`${count} grille${count > 1 ? "s" : ""} générée${count > 1 ? "s" : ""}.`);
+      button.disabled = false;
+      button.textContent = type === "premium" ? "Générer Premium" : "🎲 Générer une grille Free";
     }
 
-    function whisperGrid() {
-      const grid = createGrid("Chuchotement galactique");
-      state.whisperGrid = grid;
-      state.history = [grid, ...state.history].slice(0, 400);
-      saveState();
-      renderAll();
-      toast("Grille chuchotée 🤫");
-    }
-
-    function saveWhisper() {
-      if (!state.whisperGrid) {
-        toast("Chuchote d’abord une grille.");
-        return;
-      }
-
-      addFavorite(state.whisperGrid, true);
-    }
-
-    function copyWhisper() {
-      if (!state.whisperGrid) {
-        toast("Aucune grille à copier.");
-        return;
-      }
-
-      copyGrid(state.whisperGrid);
-    }
-
-    function renderWhisper() {
-      if (!state.whisperGrid) return;
-
-      const grid = state.whisperGrid;
-      const config = CONFIG[grid.mode];
-
-      els.whisperText.textContent =
-`chuchote très fort...
-
-ok ok... 🤫
-
-${grid.numbers.map(pad).join(" - ")}
-${config.bonusCount > 1 ? "⭐ " : "Chance "}
-${grid.bonus.map(pad).join(" - ")}
-${config.bonusCount > 1 ? " ⭐" : ""}
-
-Mais attention : ce sont juste des numéros générés au hasard.
-Je ne peux pas connaître les vrais résultats.
-
-Aucun gain garanti.
-
-Bonne chance 🍀🤞`;
-    }
-
-    function createGrid(title) {
-      const config = CONFIG[state.mode];
+    function buildRandomGrid() {
+      const config = CONFIG[game];
 
       return {
-        id: uid(),
-        mode: state.mode,
-        title,
-        numbers: pickUnique(config.mainMax, config.mainCount),
-        bonus: pickUnique(config.bonusMax, config.bonusCount),
-        createdAt: new Date().toISOString()
+        main: pickUnique(1, config.mainMax, config.mainCount),
+        extra: pickUnique(1, config.extraMax, config.extraCount)
       };
     }
 
-    function pickUnique(max, count) {
-      const set = new Set();
+    function buildPremiumGrid() {
+      let best = null;
 
-      while (set.size < count) {
-        set.add(randomInt(max) + 1);
+      for (let i = 0; i < 120; i++) {
+        const candidate = buildRandomGrid();
+        const scored = scoreGrid(candidate.main, candidate.extra);
+
+        const full = {
+          ...candidate,
+          score: scored.score,
+          details: scored.details
+        };
+
+        if (!best || full.score > best.score) {
+          best = full;
+        }
       }
 
-      return Array.from(set).sort((a, b) => a - b);
+      return best;
     }
 
-    function randomInt(maxExclusive) {
-      if (crypto && crypto.getRandomValues) {
+    function premiumBatch() {
+      if (!state.premium) {
+        toast("Débloque Premium avec le code.");
+        return;
+      }
+
+      const created = [];
+
+      for (let i = 0; i < 5; i++) {
+        const grid = buildPremiumGrid();
+
+        created.push({
+          id: makeId(),
+          game,
+          type: "premium",
+          main: grid.main,
+          extra: grid.extra,
+          score: grid.score,
+          details: grid.details,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      currentGrid = created[0];
+      state.history = [...created, ...state.history].slice(0, 80);
+      saveState();
+
+      renderCurrentBalls(currentGrid);
+      showAnalysis(currentGrid);
+      renderAll();
+      toast("5 grilles Premium générées.");
+    }
+
+    function scoreGrid(main, extra) {
+      const config = CONFIG[game];
+      const profile = buildProfile(game);
+      let score = 40;
+      const details = [];
+
+      const odd = main.filter((n) => n % 2 !== 0).length;
+      const low = main.filter((n) => n <= Math.floor(config.mainMax / 2)).length;
+      const sum = main.reduce((a, b) => a + b, 0);
+      const gaps = [];
+
+      for (let i = 1; i < main.length; i++) {
+        gaps.push(main[i] - main[i - 1]);
+      }
+
+      const consecutive = gaps.filter((g) => g === 1).length;
+      const averageGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+
+      if (odd === 2 || odd === 3) {
+        score += 14;
+        details.push("pair/impair équilibré");
+      }
+
+      if (low === 2 || low === 3) {
+        score += 14;
+        details.push("petits/grands équilibrés");
+      }
+
+      const targetMin = game === "euro" ? 115 : 105;
+      const targetMax = game === "euro" ? 170 : 165;
+
+      if (sum >= targetMin && sum <= targetMax) {
+        score += 16;
+        details.push("somme cohérente");
+      }
+
+      if (consecutive <= 1) {
+        score += 8;
+        details.push("peu de suites directes");
+      }
+
+      if (averageGap >= 5) {
+        score += 8;
+        details.push("écarts corrects");
+      }
+
+      if (profile.hasData) {
+        const hotHits = main.filter((n) => profile.hot.includes(n)).length;
+        const coldHits = main.filter((n) => profile.cold.includes(n)).length;
+
+        if (hotHits >= 1 && hotHits <= 3) {
+          score += 10;
+          details.push("présence de numéros chauds");
+        }
+
+        if (coldHits >= 1 && coldHits <= 2) {
+          score += 8;
+          details.push("mix avec numéros froids");
+        }
+      }
+
+      return {
+        score: Math.min(99, score),
+        details
+      };
+    }
+
+    function showAnalysis(grid) {
+      const config = CONFIG[grid.game];
+      const title = grid.type === "premium"
+        ? "Analyse Premium"
+        : "Analyse Free";
+
+      const scoreText = state.premium || grid.type === "premium"
+        ? `Score statistique interne : ${grid.score}/99. `
+        : "";
+
+      const details = grid.details && grid.details.length
+        ? grid.details.join(", ")
+        : "grille générée aléatoirement";
+
+      $("#analysisTitle").textContent = title;
+      $("#analysisText").textContent =
+        `${scoreText}${config.label} : ${grid.main.join(" - ")} | ${config.extraLabel} : ${grid.extra.join(" - ")}. Méthode : ${details}. Aucun gain garanti.`;
+
+      $("#analysis").classList.add("show");
+    }
+
+    function renderCurrentBalls(grid) {
+      const mainBalls = $$("#mainBalls .ball");
+      const extraBalls = $$("#extraBalls .ball");
+
+      mainBalls.forEach((ball, index) => {
+        ball.textContent = grid.main[index] || "?";
+        ball.classList.add("show");
+      });
+
+      extraBalls.forEach((ball, index) => {
+        ball.textContent = grid.extra[index] || "?";
+        ball.classList.add("show");
+      });
+    }
+
+    function pickUnique(min, max, count) {
+      const nums = [];
+
+      while (nums.length < count) {
+        const n = secureRandomInt(max - min + 1) + min;
+        if (!nums.includes(n)) nums.push(n);
+      }
+
+      return nums.sort((a, b) => a - b);
+    }
+
+    function secureRandomInt(maxExclusive) {
+      if (window.crypto && window.crypto.getRandomValues) {
         const array = new Uint32Array(1);
         const limit = Math.floor(0x100000000 / maxExclusive) * maxExclusive;
 
         do {
-          crypto.getRandomValues(array);
+          window.crypto.getRandomValues(array);
         } while (array[0] >= limit);
 
         return array[0] % maxExclusive;
@@ -1199,151 +1300,261 @@ Bonne chance 🍀🤞`;
       return Math.floor(Math.random() * maxExclusive);
     }
 
-    function uid() {
-      if (crypto && crypto.randomUUID) return crypto.randomUUID();
-      return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
-    }
+    function unlockPremium() {
+      const value = $("#premiumCode").value.trim().toLowerCase();
 
-    function renderGenerated() {
-      if (!state.generated.length) {
-        els.generatedList.innerHTML = `
-          <div class="empty">
-            Appuie sur “Générer” pour créer tes premières grilles ${CONFIG[state.mode].label}.
-          </div>
-        `;
+      if (value !== PREMIUM_CODE) {
+        toast("Code Premium incorrect.");
         return;
       }
 
-      els.generatedList.innerHTML = state.generated.map((grid) => gridHtml(grid, "generated")).join("");
-      bindGridButtons();
+      state.premium = true;
+      saveState();
+      applyPremiumState();
+      renderAll();
+      toast("Premium débloqué ✅");
     }
 
-    function renderFavorites() {
-      if (!state.favorites.length) {
-        els.favoritesList.innerHTML = `
-          <div class="empty">
-            Aucun favori pour l’instant. Sauvegarde tes meilleures grilles ici.
-          </div>
-        `;
+    function applyPremiumState() {
+      document.body.classList.toggle("premium", state.premium);
+    }
+
+    function saveCurrent() {
+      if (!currentGrid) {
+        toast("Génère d’abord une grille.");
         return;
       }
 
-      els.favoritesList.innerHTML = state.favorites.map((grid) => gridHtml(grid, "favorite")).join("");
-      bindGridButtons();
+      addFavorite(currentGrid);
     }
 
-    function gridHtml(grid, type) {
-      const config = CONFIG[grid.mode] || CONFIG.euromillions;
-      const isFavorite = type === "favorite";
-
-      const numbers = grid.numbers.map((n) => `<span class="ball">${pad(n)}</span>`).join("");
-      const bonus = grid.bonus.map((n) => `<span class="ball bonus">${pad(n)}</span>`).join("");
-
-      return `
-        <article class="grid-card ${isFavorite ? "favorite" : ""}">
-          <div class="grid-head">
-            <div>
-              <h3 class="grid-title">${escapeHtml(grid.title || config.label)}</h3>
-              <div class="grid-meta">${config.label} · ${formatDate(grid.createdAt || grid.savedAt)}</div>
-            </div>
-            <div>${isFavorite ? "⭐" : "🎲"}</div>
-          </div>
-
-          <div class="grid-meta">Numéros</div>
-          <div class="balls">${numbers}</div>
-
-          <div class="grid-meta">${config.bonusLabel}</div>
-          <div class="balls">${bonus}</div>
-
-          <div class="grid-actions">
-            ${
-              isFavorite
-                ? `<button class="small-btn" data-copy="${grid.favoriteId}">Copier</button>
-                   <button class="small-btn warn" data-remove="${grid.favoriteId}">Supprimer</button>`
-                : `<button class="small-btn" data-favorite="${grid.id}">Favori</button>
-                   <button class="small-btn" data-copy="${grid.id}">Copier</button>`
-            }
-          </div>
-        </article>
-      `;
-    }
-
-    function bindGridButtons() {
-      $$("[data-favorite]").forEach((button) => {
-        button.onclick = () => {
-          const grid = state.generated.find((item) => item.id === button.dataset.favorite);
-          if (grid) addFavorite(grid, true);
-        };
-      });
-
-      $$("[data-remove]").forEach((button) => {
-        button.onclick = () => removeFavorite(button.dataset.remove);
-      });
-
-      $$("[data-copy]").forEach((button) => {
-        button.onclick = () => {
-          const id = button.dataset.copy;
-          const grid =
-            state.generated.find((item) => item.id === id) ||
-            state.favorites.find((item) => item.favoriteId === id);
-
-          if (grid) copyGrid(grid);
-        };
-      });
-    }
-
-    function addFavorite(grid, shouldToast) {
+    function addFavorite(grid) {
       const exists = state.favorites.some((fav) => signature(fav) === signature(grid));
 
       if (exists) {
         toast("Cette grille est déjà en favori.");
-        return false;
+        return;
       }
 
       state.favorites.unshift({
         ...clone(grid),
-        favoriteId: uid(),
+        favoriteId: makeId(),
         savedAt: new Date().toISOString()
       });
 
-      state.favorites = state.favorites.slice(0, 150);
+      state.favorites = state.favorites.slice(0, 80);
       saveState();
       renderAll();
-
-      if (shouldToast) toast("Grille ajoutée aux favoris ⭐");
-      return true;
+      toast("Grille ajoutée aux favoris ⭐");
     }
 
-    function saveAllGenerated() {
-      if (!state.generated.length) {
-        toast("Génère d’abord des grilles.");
+    function copyCurrent() {
+      if (!currentGrid) {
+        toast("Aucune grille à copier.");
         return;
       }
 
-      let added = 0;
+      copyText(gridText(currentGrid));
+    }
 
-      state.generated.forEach((grid) => {
-        const ok = addFavorite(grid, false);
-        if (ok) added++;
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("Copié.");
+      } catch {
+        toast(text);
+      }
+    }
+
+    function gridText(grid) {
+      const config = CONFIG[grid.game];
+      return `${config.label} — ${grid.main.join(" - ")} | ${config.extraLabel} : ${grid.extra.join(" - ")} | Aucun gain garanti.`;
+    }
+
+    function signature(grid) {
+      return `${grid.game}|${grid.main.join("-")}|${grid.extra.join("-")}`;
+    }
+
+    function checkResults() {
+      const config = CONFIG[game];
+      const main = parseNumberInput($("#resultMain").value, config.mainCount, config.mainMax);
+      const extra = parseNumberInput($("#resultExtra").value, config.extraCount, config.extraMax);
+
+      if (!main || !extra) {
+        toast(`Entre ${config.mainCount} numéros et ${config.extraCount} ${config.extraLabel.toLowerCase()}.`);
+        return;
+      }
+
+      const result = {
+        id: makeId(),
+        game,
+        main,
+        extra,
+        createdAt: new Date().toISOString()
+      };
+
+      state.results.unshift(result);
+      state.results = state.results.slice(0, 40);
+      saveState();
+
+      const grids = uniqueGrids([...state.favorites, ...state.history]).filter((grid) => grid.game === game);
+
+      if (!grids.length) {
+        $("#resultList").innerHTML = `<div class="empty">Aucune grille à contrôler.</div>`;
+        renderStats();
+        return;
+      }
+
+      $("#resultList").innerHTML = grids.slice(0, 30).map((grid) => resultHtml(grid, result)).join("");
+
+      renderStats();
+      renderPremiumStats();
+      toast("Résultats contrôlés.");
+    }
+
+    function parseNumberInput(value, count, max) {
+      const nums = value
+        .split(/[\s,;.-]+/)
+        .map((v) => Number(v.trim()))
+        .filter((n) => Number.isInteger(n));
+
+      const unique = Array.from(new Set(nums)).sort((a, b) => a - b);
+
+      if (unique.length !== count) return null;
+      if (unique.some((n) => n < 1 || n > max)) return null;
+
+      return unique;
+    }
+
+    function resultHtml(grid, result) {
+      const config = CONFIG[grid.game];
+      const mainMatch = grid.main.filter((n) => result.main.includes(n)).length;
+      const extraMatch = grid.extra.filter((n) => result.extra.includes(n)).length;
+      const possible = isPossibleWin(grid.game, mainMatch, extraMatch);
+
+      return `
+        <div class="item">
+          <div class="item-top">
+            <span>${config.icon} ${config.label} · ${grid.type === "premium" ? "Premium" : "Free"}</span>
+            <span class="result-status ${possible ? "win" : "lose"}">
+              ${possible ? "Gagné possible" : "Pas gagné indicatif"}
+            </span>
+          </div>
+
+          <div class="chip-row">
+            ${grid.main.map((n) => `<span class="chip">${n}</span>`).join("")}
+            ${grid.extra.map((n) => `<span class="chip hot">${n}</span>`).join("")}
+          </div>
+
+          <p class="notice">
+            Correspondance : ${mainMatch} numéro${mainMatch > 1 ? "s" : ""} + ${extraMatch} ${config.extraLabel.toLowerCase()}.
+            À vérifier sur ton reçu.
+          </p>
+        </div>
+      `;
+    }
+
+    function isPossibleWin(gridGame, mainMatch, extraMatch) {
+      if (gridGame === "euro") {
+        return mainMatch >= 2 || (mainMatch >= 1 && extraMatch === 2);
+      }
+
+      return mainMatch >= 2 || extraMatch >= 1;
+    }
+
+    function renderAll() {
+      renderHistory();
+      renderFavorites();
+      renderStats();
+      renderPremiumStats();
+      renderPwaStatus();
+    }
+
+    function renderHistory() {
+      const list = $("#historyList");
+      const items = state.history.filter((grid) => grid.game === game);
+
+      if (!items.length) {
+        list.innerHTML = `<div class="empty">Aucune grille générée.</div>`;
+        return;
+      }
+
+      list.innerHTML = items.slice(0, 12).map((grid) => gridItemHtml(grid, "history")).join("");
+      bindItemButtons();
+    }
+
+    function renderFavorites() {
+      const list = $("#favoritesList");
+      const items = state.favorites.filter((grid) => grid.game === game);
+
+      if (!items.length) {
+        list.innerHTML = `<div class="empty">Aucun favori.</div>`;
+        return;
+      }
+
+      list.innerHTML = items.map((grid) => gridItemHtml(grid, "favorite")).join("");
+      bindItemButtons();
+    }
+
+    function gridItemHtml(grid, type) {
+      const config = CONFIG[grid.game];
+      const id = type === "favorite" ? grid.favoriteId : grid.id;
+
+      return `
+        <div class="item">
+          <div class="item-top">
+            <span>${config.icon} ${config.label} · ${grid.type === "premium" ? "Premium" : "Free"}</span>
+            <span>${grid.score ? grid.score + "/99" : ""}</span>
+          </div>
+
+          <div class="chip-row">
+            ${grid.main.map((n) => `<span class="chip">${n}</span>`).join("")}
+            ${grid.extra.map((n) => `<span class="chip hot">${n}</span>`).join("")}
+          </div>
+
+          <div class="item-actions">
+            <button class="small-btn" data-copy="${id}" data-type="${type}">Copier</button>
+            ${
+              type === "history"
+                ? `<button class="small-btn" data-fav="${id}">Favori</button>`
+                : `<button class="small-btn danger" data-del="${id}">Supprimer</button>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function bindItemButtons() {
+      $$("[data-copy]").forEach((button) => {
+        button.onclick = () => {
+          const grid = findGrid(button.dataset.copy, button.dataset.type);
+          if (grid) copyText(gridText(grid));
+        };
       });
 
-      saveState();
-      renderAll();
-      toast(`${added} grille${added > 1 ? "s" : ""} ajoutée${added > 1 ? "s" : ""} aux favoris.`);
+      $$("[data-fav]").forEach((button) => {
+        button.onclick = () => {
+          const grid = findGrid(button.dataset.fav, "history");
+          if (grid) addFavorite(grid);
+        };
+      });
+
+      $$("[data-del]").forEach((button) => {
+        button.onclick = () => {
+          state.favorites = state.favorites.filter((grid) => grid.favoriteId !== button.dataset.del);
+          saveState();
+          renderAll();
+          toast("Favori supprimé.");
+        };
+      });
     }
 
-    function removeFavorite(favoriteId) {
-      state.favorites = state.favorites.filter((item) => item.favoriteId !== favoriteId);
-      saveState();
-      renderAll();
-      toast("Favori supprimé.");
-    }
+    function findGrid(id, type) {
+      if (type === "favorite") {
+        return state.favorites.find((grid) => grid.favoriteId === id);
+      }
 
-    function clearGenerated() {
-      state.generated = [];
-      saveState();
-      renderGenerated();
-      toast("Écran vidé.");
+      return state.history.find((grid) => grid.id === id);
     }
 
     function clearFavorites() {
@@ -1360,278 +1571,19 @@ Bonne chance 🍀🤞`;
       toast("Favoris supprimés.");
     }
 
-    function clearHistory() {
-      if (!state.history.length) {
-        toast("Aucun historique à effacer.");
-        return;
-      }
-
-      if (!confirm("Effacer l’historique des grilles ?")) return;
-
-      state.history = [];
-      saveState();
-      renderAll();
-      toast("Historique effacé.");
-    }
-
-    function signature(grid) {
-      return `${grid.mode}|${grid.numbers.join("-")}|${grid.bonus.join("-")}`;
-    }
-
-    function renderStats() {
-      const mode = state.mode;
-      const config = CONFIG[mode];
-      const source = [...state.history, ...state.favorites].filter((grid) => grid.mode === mode);
-
-      if (!source.length) {
-        els.statsList.innerHTML = `
-          <div class="empty">
-            Pas encore assez de données pour ${config.label}.
-            Génère des grilles pour afficher les statistiques internes.
-          </div>
-        `;
-        return;
-      }
-
-      const main = topFrequency(source, "numbers", config.mainMax, 8);
-      const bonus = topFrequency(source, "bonus", config.bonusMax, Math.min(6, config.bonusMax));
-
-      els.statsList.innerHTML = `
-        <div class="empty">
-          Analyse de ${source.length} grille${source.length > 1 ? "s" : ""} ${config.label}.
-        </div>
-
-        <h3 class="section-title" style="font-size:1rem;margin-top:12px;">Numéros fréquents <small>Interne</small></h3>
-        ${main.map((item) => statHtml(item, main[0]?.count || 1)).join("")}
-
-        <h3 class="section-title" style="font-size:1rem;margin-top:12px;">${config.bonusLabel} <small>Interne</small></h3>
-        ${bonus.map((item) => statHtml(item, bonus[0]?.count || 1)).join("")}
-      `;
-    }
-
-    function topFrequency(items, key, max, limit) {
-      const map = new Map();
-
-      for (let i = 1; i <= max; i++) map.set(i, 0);
-
-      items.forEach((grid) => {
-        const values = Array.isArray(grid[key]) ? grid[key] : [];
-        values.forEach((number) => map.set(number, (map.get(number) || 0) + 1));
-      });
-
-      return Array.from(map.entries())
-        .map(([number, count]) => ({ number, count }))
-        .sort((a, b) => b.count - a.count || a.number - b.number)
-        .slice(0, limit);
-    }
-
-    function statHtml(item, maxCount) {
-      const percent = maxCount > 0 ? Math.round((item.count / maxCount) * 100) : 0;
-
-      return `
-        <div class="stat-row">
-          <div class="stat-label">
-            <span>N° ${pad(item.number)}</span>
-            <span>${item.count} fois</span>
-          </div>
-          <div class="bar"><span style="width:${percent}%"></span></div>
-        </div>
-      `;
-    }
-
-    function setDefaultReminderDate() {
-      const d = new Date();
-      d.setHours(19, 0, 0, 0);
-      if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
-      els.reminderDate.value = toDateTimeLocal(d);
-    }
-
-    function addReminder() {
-      const dateValue = els.reminderDate.value;
-      const mode = els.reminderMode.value;
-      const note = els.reminderNote.value.trim();
-
-      if (!dateValue) {
-        toast("Choisis une date et une heure.");
-        return;
-      }
-
-      const due = new Date(dateValue);
-
-      if (Number.isNaN(due.getTime())) {
-        toast("Date invalide.");
-        return;
-      }
-
-      state.reminders.unshift({
-        id: uid(),
-        mode,
-        note: note || defaultReminderNote(mode),
-        dueAt: due.toISOString(),
-        done: false,
-        createdAt: new Date().toISOString()
-      });
-
-      state.reminders = state.reminders.slice(0, 50);
-      saveState();
-      renderReminders();
-      toast("Rappel ajouté.");
-    }
-
-    function defaultReminderNote(mode) {
-      if (CONFIG[mode]) return `Préparer mes grilles ${CONFIG[mode].label}.`;
-      return "Rappel Galactic Lottery.";
-    }
-
-    function renderReminders() {
-      if (!state.reminders.length) {
-        els.reminderList.innerHTML = `
-          <div class="empty">
-            Aucun rappel. Ajoute une date pour ne pas oublier de préparer tes grilles.
-          </div>
-        `;
-        return;
-      }
-
-      els.reminderList.innerHTML = state.reminders.map((reminder) => {
-        const label = CONFIG[reminder.mode]?.label || "Rappel";
-
-        return `
-          <div class="reminder-item ${reminder.done ? "done" : ""}">
-            <strong>${escapeHtml(label)} ${reminder.done ? "· terminé" : ""}</strong>
-            <small>${formatDate(reminder.dueAt)}</small>
-            <p class="status-line" style="margin-top:8px;">${escapeHtml(reminder.note)}</p>
-            <div class="grid-actions">
-              ${
-                reminder.done
-                  ? `<button class="small-btn" data-reminder-undone="${reminder.id}">Réactiver</button>`
-                  : `<button class="small-btn" data-reminder-done="${reminder.id}">Terminé</button>`
-              }
-              <button class="small-btn warn" data-reminder-delete="${reminder.id}">Supprimer</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      $$("[data-reminder-delete]").forEach((button) => {
-        button.onclick = () => deleteReminder(button.dataset.reminderDelete);
-      });
-
-      $$("[data-reminder-done]").forEach((button) => {
-        button.onclick = () => setReminderDone(button.dataset.reminderDone, true);
-      });
-
-      $$("[data-reminder-undone]").forEach((button) => {
-        button.onclick = () => setReminderDone(button.dataset.reminderUndone, false);
-      });
-    }
-
-    function deleteReminder(id) {
-      state.reminders = state.reminders.filter((item) => item.id !== id);
-      saveState();
-      renderReminders();
-      toast("Rappel supprimé.");
-    }
-
-    function setReminderDone(id, done) {
-      state.reminders = state.reminders.map((item) => {
-        if (item.id !== id) return item;
-        return { ...item, done };
-      });
-
-      saveState();
-      renderReminders();
-    }
-
-    function checkDueReminders() {
-      let changed = false;
-      const now = Date.now();
-
-      state.reminders.forEach((reminder) => {
-        if (reminder.done) return;
-        const due = new Date(reminder.dueAt).getTime();
-
-        if (due <= now) {
-          reminder.done = true;
-          changed = true;
-
-          const title = CONFIG[reminder.mode]?.label || "Galactic Lottery";
-          showNotification(`Rappel ${title}`, reminder.note);
-          toast(`Rappel : ${reminder.note}`);
-        }
-      });
-
-      if (changed) {
-        saveState();
-        renderReminders();
-      }
-    }
-
-    async function requestNotificationPermission() {
-      if (!("Notification" in window)) {
-        toast("Notifications non disponibles sur ce navigateur.");
-        return;
-      }
-
-      const permission = await Notification.requestPermission();
-
-      if (permission === "granted") {
-        toast("Notifications activées.");
-      } else {
-        toast("Notifications non autorisées.");
-      }
-    }
-
-    function showNotification(title, body) {
-      if (!("Notification" in window)) return;
-      if (Notification.permission !== "granted") return;
-
-      try {
-        new Notification(title, {
-          body,
-          icon: "/icon-192.png",
-          badge: "/icon-192.png"
-        });
-      } catch {}
-    }
-
-    async function copyGrid(grid) {
-      const config = CONFIG[grid.mode] || CONFIG.euromillions;
-      const text = `${config.label} — Numéros : ${grid.numbers.map(pad).join(" - ")} | ${config.bonusLabel} : ${grid.bonus.map(pad).join(" - ")} | Aucun gain garanti.`;
-
-      try {
-        await navigator.clipboard.writeText(text);
-        toast("Grille copiée.");
-      } catch {
-        toast(text);
-      }
-    }
-
-    async function copyUrl() {
-      try {
-        await navigator.clipboard.writeText(location.href);
-        toast("Lien copié.");
-      } catch {
-        toast("Impossible de copier le lien.");
-      }
-    }
-
     function exportFavorites() {
-      if (!state.favorites.length) {
+      const items = state.favorites.filter((grid) => grid.game === game);
+
+      if (!items.length) {
         toast("Aucun favori à exporter.");
         return;
       }
 
-      const lines = state.favorites.map((grid) => {
-        const config = CONFIG[grid.mode] || CONFIG.euromillions;
-        return `${config.label} | Numéros : ${grid.numbers.map(pad).join(" - ")} | ${config.bonusLabel} : ${grid.bonus.map(pad).join(" - ")} | ${formatDate(grid.savedAt || grid.createdAt)}`;
-      });
-
       const content = [
         "GALACTIC LOTTERY — FAVORIS",
-        "Application indépendante, non officielle FDJ. Aucun gain garanti.",
+        "Application indépendante. Aucun gain garanti.",
         "",
-        ...lines
+        ...items.map(gridText)
       ].join("\n");
 
       const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -1646,6 +1598,241 @@ Bonne chance 🍀🤞`;
       toast("Export généré.");
     }
 
+    function buildProfile(profileGame) {
+      const config = CONFIG[profileGame];
+      const counts = new Map();
+
+      for (let i = 1; i <= config.mainMax; i++) {
+        counts.set(i, 0);
+      }
+
+      const sourceResults = state.results.filter((result) => result.game === profileGame);
+      const sourceGrids = uniqueGrids([...state.history, ...state.favorites]).filter((grid) => grid.game === profileGame);
+
+      const source = sourceResults.length
+        ? sourceResults.map((result) => result.main)
+        : sourceGrids.map((grid) => grid.main);
+
+      source.forEach((numbers) => {
+        numbers.forEach((n) => counts.set(n, (counts.get(n) || 0) + 1));
+      });
+
+      const sortedHot = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0] - b[0])
+        .slice(0, 10)
+        .map(([n]) => n);
+
+      const sortedCold = Array.from(counts.entries())
+        .sort((a, b) => a[1] - b[1] || a[0] - b[0])
+        .slice(0, 10)
+        .map(([n]) => n);
+
+      return {
+        hot: sortedHot,
+        cold: sortedCold,
+        hasData: source.length > 0,
+        sourceType: sourceResults.length ? "résultats saisis" : "historique local"
+      };
+    }
+
+    function renderStats() {
+      const profile = buildProfile(game);
+
+      $("#hotNumbers").innerHTML = profile.hasData
+        ? profile.hot.map((n) => `<span class="chip hot">${n}</span>`).join("")
+        : `<span class="chip">?</span>`;
+
+      $("#coldNumbers").innerHTML = profile.hasData
+        ? profile.cold.map((n) => `<span class="chip cold">${n}</span>`).join("")
+        : `<span class="chip">?</span>`;
+
+      $("#statsSource").textContent = profile.hasData
+        ? `Calcul basé sur tes ${profile.sourceType}. Ces données restent locales et indicatives.`
+        : "Pas encore assez de données. Génère des grilles ou saisis des résultats pour créer les profils chaud/froid.";
+    }
+
+    function renderPremiumStats() {
+      const wrap = $("#premiumStats");
+      const profile = buildProfile(game);
+
+      if (!state.premium) return;
+
+      const grids = uniqueGrids([...state.history, ...state.favorites]).filter((grid) => grid.game === game);
+      const latest = currentGrid || grids[0];
+
+      if (!latest) {
+        wrap.innerHTML = `
+          <div class="stat-box">
+            <small>Analyse Premium</small>
+            <p class="notice" style="margin-top:0;">Génère une grille pour voir le score statistique.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const odd = latest.main.filter((n) => n % 2 !== 0).length;
+      const low = latest.main.filter((n) => n <= Math.floor(CONFIG[game].mainMax / 2)).length;
+      const sum = latest.main.reduce((a, b) => a + b, 0);
+      const score = latest.score || scoreGrid(latest.main, latest.extra).score;
+
+      wrap.innerHTML = `
+        <div class="stat-box">
+          <small>Score statistique interne</small>
+          <div class="chip-row"><span class="chip hot">${score}/99</span></div>
+        </div>
+
+        <div class="stat-box">
+          <small>Pair / impair</small>
+          <div class="chip-row">
+            <span class="chip">${5 - odd} pairs</span>
+            <span class="chip">${odd} impairs</span>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <small>Petits / grands</small>
+          <div class="chip-row">
+            <span class="chip">${low} petits</span>
+            <span class="chip">${5 - low} grands</span>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <small>Somme de grille</small>
+          <div class="chip-row"><span class="chip">${sum}</span></div>
+        </div>
+
+        <div class="stat-box">
+          <small>Base chaud/froid</small>
+          <p class="notice" style="margin-top:0;">
+            ${profile.hasData ? "Profil actif basé sur " + profile.sourceType + "." : "Pas assez de données réelles pour un profil solide."}
+          </p>
+        </div>
+      `;
+    }
+
+    function uniqueGrids(grids) {
+      const seen = new Set();
+      const out = [];
+
+      grids.forEach((grid) => {
+        const sig = signature(grid);
+        if (seen.has(sig)) return;
+        seen.add(sig);
+        out.push(grid);
+      });
+
+      return out;
+    }
+
+    function getNextDrawDate() {
+      const config = CONFIG[game];
+      const custom = state.customDraws[game];
+
+      if (custom && new Date(custom).getTime() > Date.now()) {
+        return new Date(custom);
+      }
+
+      const now = new Date();
+
+      for (let add = 0; add <= 10; add++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() + add);
+        date.setHours(config.hour, config.minute, 0, 0);
+
+        if (config.drawDays.includes(date.getDay()) && date.getTime() > now.getTime()) {
+          return date;
+        }
+      }
+
+      const fallback = new Date(now);
+      fallback.setDate(now.getDate() + 1);
+      fallback.setHours(config.hour, config.minute, 0, 0);
+      return fallback;
+    }
+
+    function startTimer() {
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const drawDate = getNextDrawDate();
+      const diff = drawDate.getTime() - Date.now();
+
+      if (diff <= 0) {
+        $("#countdown").textContent = "00:00:00";
+        $("#nextDrawText").textContent = "Tirage proche ou terminé. Vérifie la source officielle.";
+        return;
+      }
+
+      $("#countdown").textContent = durationText(diff);
+      $("#nextDrawText").textContent = `Prochain tirage indicatif : ${formatDate(drawDate.toISOString())}`;
+    }
+
+    function durationText(ms) {
+      const total = Math.floor(ms / 1000);
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const seconds = total % 60;
+
+      if (days > 0) {
+        return `${days}j ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+      }
+
+      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+
+    function setDrawInput() {
+      $("#drawInput").value = toDateTimeLocal(getNextDrawDate());
+    }
+
+    function saveCustomDraw() {
+      const value = $("#drawInput").value;
+
+      if (!value) {
+        toast("Choisis une date.");
+        return;
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        toast("Date invalide.");
+        return;
+      }
+
+      state.customDraws[game] = date.toISOString();
+      saveState();
+      updateTimer();
+      toast("Timer enregistré.");
+    }
+
+    function resetCustomDraw() {
+      delete state.customDraws[game];
+      saveState();
+      setDrawInput();
+      updateTimer();
+      toast("Timer remis en automatique.");
+    }
+
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) {
+        $("#pwaStatus").textContent = "Service Worker non compatible.";
+        return;
+      }
+
+      window.addEventListener("load", async () => {
+        try {
+          await navigator.serviceWorker.register("/sw.js");
+          renderPwaStatus();
+        } catch {
+          $("#pwaStatus").textContent = "Service Worker non actif. Vérifie sw.js.";
+        }
+      });
+    }
+
     function initInstallPrompt() {
       window.addEventListener("beforeinstallprompt", (event) => {
         event.preventDefault();
@@ -1655,7 +1842,7 @@ Bonne chance 🍀🤞`;
 
       window.addEventListener("appinstalled", () => {
         deferredInstallPrompt = null;
-        toast("Galactic Lottery est installée.");
+        toast("Application installée.");
         renderPwaStatus();
       });
     }
@@ -1669,51 +1856,41 @@ Bonne chance 🍀🤞`;
         return;
       }
 
-      const isStandalone =
-        matchMedia("(display-mode: standalone)").matches ||
-        navigator.standalone === true;
-
-      if (isStandalone) {
-        toast("L’app est déjà installée.");
-        return;
-      }
-
-      toast("Si le bouton ne lance pas l’installation : menu du navigateur → Ajouter à l’écran d’accueil.");
+      toast("Si rien ne s’ouvre : menu du navigateur → Ajouter à l’écran d’accueil.");
     }
 
     function renderPwaStatus() {
       const standalone =
-        matchMedia("(display-mode: standalone)").matches ||
+        window.matchMedia("(display-mode: standalone)").matches ||
         navigator.standalone === true;
 
       if (standalone) {
-        els.pwaStatus.textContent = `Application installée en mode PWA. Version ${APP_VERSION}.`;
+        $("#pwaStatus").textContent = `Application installée en mode PWA. Version ${APP_VERSION}.`;
         return;
       }
 
       if (deferredInstallPrompt) {
-        els.pwaStatus.textContent = "Installation disponible. Appuie sur “Installer l’app”.";
+        $("#pwaStatus").textContent = "Installation disponible : appuie sur Installer.";
         return;
       }
 
-      els.pwaStatus.textContent =
-        "Sur Android : menu du navigateur → Ajouter à l’écran d’accueil. Le bouton Installer apparaît selon le navigateur.";
+      $("#pwaStatus").textContent = "Sur Android : menu du navigateur → Ajouter à l’écran d’accueil. Le bouton apparaît selon le navigateur.";
     }
 
-    function registerServiceWorker() {
-      if (!("serviceWorker" in navigator)) {
-        els.pwaStatus.textContent = "Service Worker non compatible avec ce navigateur.";
-        return;
+    function makeId() {
+      if (window.crypto && window.crypto.randomUUID) {
+        return window.crypto.randomUUID();
       }
 
-      window.addEventListener("load", async () => {
-        try {
-          await navigator.serviceWorker.register("/sw.js");
-          renderPwaStatus();
-        } catch {
-          els.pwaStatus.textContent = "Mode hors-ligne non activé. Vérifie le fichier sw.js.";
-        }
-      });
+      return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     function pad(n) {
@@ -1727,7 +1904,7 @@ Bonne chance 🍀🤞`;
           timeStyle: "short"
         }).format(new Date(value));
       } catch {
-        return "";
+        return "À vérifier";
       }
     }
 
@@ -1737,24 +1914,20 @@ Bonne chance 🍀🤞`;
       return local.toISOString().slice(0, 16);
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function scrollToId(id) {
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     let toastTimer = null;
 
     function toast(message) {
-      els.toast.textContent = message;
-      els.toast.classList.add("show");
+      $("#toast").textContent = message;
+      $("#toast").classList.add("show");
 
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
-        els.toast.classList.remove("show");
+        $("#toast").classList.remove("show");
       }, 2800);
     }
   </script>
