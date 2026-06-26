@@ -1,4 +1,4 @@
-const CACHE_NAME = "galactic-lottery-cache-v1.1.0";
+const CACHE_NAME = "galactic-lottery-recovery-v1.3.0";
 
 const CORE_ASSETS = [
   "/",
