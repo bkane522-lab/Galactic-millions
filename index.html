@@ -3,30 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#080010" />
-  <meta name="description" content="Galactic Lottery : générateur indépendant Euromillions et Loto avec timer, favoris, résultats, stats chaud/froid et mode Premium." />
-
-  <title>Galactic Lottery</title>
+  <meta name="theme-color" content="#061950" />
+  <title>Galactic Lottery V6.4</title>
 
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
 
   <style>
     :root {
-      --bg: #07000f;
-      --card: rgba(255,255,255,0.055);
-      --card2: rgba(255,255,255,0.09);
-      --line: rgba(142,82,255,0.28);
-      --text: #f5eeff;
-      --muted: rgba(245,238,255,0.68);
-      --soft: rgba(245,238,255,0.38);
-      --gold: #f4c84a;
-      --blue: #0060ff;
-      --red: #e21b16;
-      --violet: #8a4dff;
-      --green: #50ffb6;
-      --danger: #ff5577;
-      --shadow: 0 24px 85px rgba(0,0,0,0.55);
+      --navy: #061950;
+      --navy2: #020817;
+      --blue: #006bff;
+      --gold: #ffd84d;
+      --text: #071b4d;
+      --muted: #6c7280;
+      --white: #ffffff;
+      --soft: #f3f6fb;
+      --green: #16c66a;
+      --dark: #07142f;
+      --purple: #9b5cff;
+      --danger: #ef3e5c;
+      --radius: 28px;
+      --shadow: 0 16px 45px rgba(0,0,0,.24);
     }
 
     * {
@@ -36,579 +34,485 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html {
-      background: var(--bg);
-      scroll-behavior: smooth;
+    html,
+    body {
+      height: 100%;
+      background: var(--navy2);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
     }
 
     body {
-      min-height: 100vh;
-      overflow-x: hidden;
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--white);
       background:
-        radial-gradient(circle at 20% 0%, rgba(142,82,255,0.23), transparent 34%),
-        radial-gradient(circle at 82% 8%, rgba(244,200,74,0.13), transparent 28%),
-        radial-gradient(circle at 45% 80%, rgba(0,96,255,0.12), transparent 42%),
-        linear-gradient(180deg, #05000b, #11001e 55%, #05000b);
+        radial-gradient(circle at 20% 0%, rgba(255,216,77,.25), transparent 25%),
+        radial-gradient(circle at 80% 15%, rgba(0,107,255,.28), transparent 32%),
+        linear-gradient(180deg, #06276b 0%, #020817 68%);
     }
 
     .stars {
       position: fixed;
       inset: 0;
-      z-index: 0;
       pointer-events: none;
-      overflow: hidden;
-    }
-
-    .star {
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      animation: twinkle var(--d, 3s) infinite alternate;
-    }
-
-    @keyframes twinkle {
-      from { opacity: 0.12; transform: scale(1); }
-      to { opacity: 0.95; transform: scale(1.45); }
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.75) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 1px);
+      background-size: 80px 80px, 130px 130px;
+      opacity: .22;
     }
 
     .app {
       position: relative;
       z-index: 1;
-      width: min(620px, 100%);
+      height: 100dvh;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 18px 13px 128px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
     }
 
-    .header {
-      text-align: center;
-      padding: 10px 0 18px;
+    .hero {
+      flex: 0 0 auto;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(255,216,77,.20), transparent 25%),
+        linear-gradient(135deg, #0a3288, #061950 65%);
+      border-radius: 0 0 34px 34px;
+      margin: -14px -14px 14px;
+      padding: 20px 16px 22px;
+      box-shadow: var(--shadow);
+      min-height: 196px;
     }
 
-    .logo {
-      font-size: 60px;
-      display: block;
-      margin-bottom: 8px;
-      filter: drop-shadow(0 0 24px rgba(244,200,74,0.65));
-      animation: float 4s ease-in-out infinite;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
 
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
     }
 
-    h1 {
-      font-size: clamp(1.9rem, 7vw, 3rem);
+    .app-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 30% 20%, #fff, #ffd84d 12%, #9b5cff 36%, #061950 80%);
+      box-shadow: 0 0 24px rgba(255,216,77,.45);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      flex: 0 0 58px;
+    }
+
+    .brand h1 {
+      font-size: 1.58rem;
       line-height: 1;
-      letter-spacing: 4px;
+      letter-spacing: 2px;
+      font-weight: 950;
+    }
+
+    .brand p {
+      margin-top: 4px;
+      font-weight: 800;
+      color: rgba(255,255,255,.82);
+      font-size: .92rem;
+    }
+
+    .smart-badge {
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      padding: 12px 17px;
+      background: rgba(255,255,255,.18);
       color: var(--gold);
       font-weight: 950;
-      text-shadow: 0 0 26px rgba(244,200,74,0.25);
+      box-shadow: inset 0 1px 12px rgba(255,255,255,.12);
     }
 
-    .subtitle {
-      margin-top: 8px;
-      color: var(--violet);
-      letter-spacing: 4px;
-      font-weight: 850;
-      font-size: 0.76rem;
+    .tagline {
+      margin-top: 18px;
+    }
+
+    .tagline small {
+      display: block;
+      font-weight: 900;
+      color: rgba(255,255,255,.9);
+      font-size: 1rem;
+    }
+
+    .tagline h2 {
+      margin-top: 4px;
+      color: var(--gold);
+      font-size: clamp(2.1rem, 8vw, 3.4rem);
+      line-height: .95;
+      letter-spacing: 2px;
+      font-weight: 950;
       text-transform: uppercase;
     }
 
-    .top-actions {
-      margin-top: 14px;
-      display: flex;
-      justify-content: center;
-      gap: 9px;
-      flex-wrap: wrap;
+    .tagline strong {
+      display: block;
+      margin-top: 4px;
+      letter-spacing: 4px;
+      font-size: 1.05rem;
     }
 
-    .pill-btn,
-    .btn,
-    .tab,
-    .nav-btn,
-    .small-btn {
-      cursor: pointer;
-      border: 0;
-      font: inherit;
-    }
-
-    .pill-btn {
-      border-radius: 999px;
-      padding: 10px 13px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.13);
-      color: var(--text);
-      font-weight: 900;
-    }
-
-    .pill-btn.gold {
-      color: #140700;
-      background: linear-gradient(135deg, var(--gold), #fff0a8);
-      border: 0;
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 6px;
-      margin-bottom: 14px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.045);
-    }
-
-    .tab {
-      border-radius: 13px;
-      padding: 14px 9px;
-      background: transparent;
-      color: rgba(245,238,255,0.42);
-      font-weight: 950;
-      letter-spacing: 1px;
-    }
-
-    .tab.active.euro {
-      color: var(--gold);
-      background: linear-gradient(135deg, #001b73, #0060ff);
-      box-shadow: 0 0 24px rgba(0,96,255,0.42);
-    }
-
-    .tab.active.loto {
-      color: #ffe7a6;
-      background: linear-gradient(135deg, #770000, #e21b16);
-      box-shadow: 0 0 24px rgba(226,27,22,0.40);
-    }
-
-    .card {
-      margin-bottom: 14px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(13px);
-      scroll-margin-top: 15px;
-    }
-
-    .card-title {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 14px;
-    }
-
-    .card-title h2 {
-      font-size: 1.18rem;
-      letter-spacing: -0.02em;
-    }
-
-    .card-title small {
-      color: var(--soft);
-      text-align: right;
-      font-weight: 850;
+    .tagline p {
+      margin-top: 10px;
+      color: rgba(255,255,255,.82);
+      font-size: .94rem;
       line-height: 1.35;
     }
 
-    .timer-box {
-      text-align: center;
-      padding: 18px 12px;
-      border: 1px solid rgba(244,200,74,0.22);
-      border-radius: 20px;
-      background:
-        radial-gradient(circle at top right, rgba(244,200,74,0.13), transparent 38%),
-        rgba(0,0,0,0.20);
+    .game-tabs {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
-    .timer-label {
-      color: var(--soft);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 0.72rem;
-      font-weight: 850;
+    .game-tab {
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 10px;
+      background: rgba(255,255,255,.15);
+      color: rgba(255,255,255,.65);
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
     }
 
-    .timer {
-      margin-top: 7px;
-      font-size: clamp(2rem, 10vw, 3.4rem);
+    .game-tab.active {
+      background: var(--white);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .main-card {
+      flex: 0 0 auto;
+      background: linear-gradient(180deg, #f9fbff, #eef3fa);
+      color: var(--text);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-head h3 {
+      font-size: 1.65rem;
       line-height: 1;
       font-weight: 950;
-      color: var(--gold);
-      letter-spacing: -0.05em;
     }
 
-    .timer-note {
-      margin-top: 8px;
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 0.88rem;
+    .badge {
+      border-radius: 999px;
+      padding: 9px 13px;
+      background: #eef3ff;
+      color: #0846a0;
+      font-weight: 950;
+      font-size: 1rem;
     }
 
-    label {
-      display: grid;
-      gap: 7px;
+    .draw-text {
       color: var(--muted);
       font-weight: 850;
-      font-size: 0.88rem;
-      margin-top: 12px;
+      margin-bottom: 12px;
+      font-size: .98rem;
     }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 13px;
-      border-radius: 15px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.25);
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .time-box {
+      border: 1px solid #dfe7f4;
+      border-radius: 17px;
+      padding: 11px 6px;
+      text-align: center;
+      background: #f7f9fd;
+    }
+
+    .time-box strong {
+      display: block;
+      font-size: 1.55rem;
+      line-height: 1;
+      font-weight: 950;
       color: var(--text);
-      outline: none;
-      font: inherit;
-      font-weight: 750;
     }
 
-    textarea {
-      min-height: 74px;
-      resize: vertical;
+    .time-box small {
+      display: block;
+      margin-top: 6px;
+      font-size: .64rem;
+      letter-spacing: 1px;
+      font-weight: 950;
+      color: var(--muted);
     }
 
-    .balls-area {
-      padding: 18px 6px 6px;
+    .label {
+      text-align: center;
+      color: var(--muted);
+      letter-spacing: 4px;
+      font-size: .82rem;
+      font-weight: 950;
+      margin: 8px 0 10px;
     }
 
-    .balls-row {
+    .balls {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
     }
 
     .ball {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
       display: grid;
       place-items: center;
-      font-weight: 950;
-      font-size: 1rem;
-      color: #fff;
-      transform: scale(0);
-      opacity: 0;
-      transition: 0.38s cubic-bezier(0.34,1.56,0.64,1);
-      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.27), rgba(0,0,0,0.45));
-      border: 2px solid rgba(255,255,255,0.17);
-    }
-
-    .ball.show {
-      transform: scale(1);
-      opacity: 1;
-    }
-
-    .euro .ball.main {
-      color: #62a7ff;
-      box-shadow: 0 0 22px rgba(0,96,255,0.60);
-    }
-
-    .loto .ball.main {
-      color: #ff7979;
-      box-shadow: 0 0 22px rgba(226,27,22,0.55);
-    }
-
-    .ball.extra {
-      width: 48px;
-      height: 48px;
-      color: var(--gold);
-      border-color: rgba(244,200,74,0.62);
-      background: radial-gradient(circle at 35% 30%, rgba(255,236,133,0.45), rgba(110,72,0,0.42));
-      box-shadow: 0 0 18px rgba(244,200,74,0.42);
-    }
-
-    .loto .ball.extra {
-      color: #ff9a9a;
-      border-color: rgba(255,90,90,0.62);
-      background: radial-gradient(circle at 35% 30%, rgba(255,100,100,0.45), rgba(110,0,0,0.42));
-      box-shadow: 0 0 18px rgba(226,27,22,0.35);
-    }
-
-    .extra-label {
-      text-align: center;
-      color: var(--soft);
-      font-size: 0.72rem;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin: 6px 0 10px;
-    }
-
-    .analysis {
-      display: none;
-      margin-top: 14px;
-      padding: 15px;
-      border-radius: 18px;
-      border: 1px solid rgba(142,82,255,0.28);
-      background: rgba(142,82,255,0.09);
-    }
-
-    .analysis.show {
-      display: block;
-    }
-
-    .analysis small {
-      display: block;
-      color: var(--violet);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 900;
-      margin-bottom: 8px;
-    }
-
-    .analysis p {
-      color: rgba(245,238,255,0.78);
-      line-height: 1.55;
-      font-style: italic;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 15px 14px;
-      border-radius: 16px;
+      background: #fff;
       color: var(--text);
       font-weight: 950;
-      letter-spacing: 1px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.13);
+      font-size: 1.3rem;
+      box-shadow: 0 8px 18px rgba(7,27,77,.13);
     }
 
-    .btn.primary.euro {
-      color: var(--gold);
-      background: linear-gradient(135deg, #001f80, #0060ff);
-      border-color: rgba(0,96,255,0.4);
-      box-shadow: 0 0 32px rgba(0,96,255,0.35);
+    .extra-ball {
+      width: 54px;
+      height: 54px;
+      border: 4px solid var(--gold);
+      background: #fffdf4;
+      box-shadow: 0 0 24px rgba(255,216,77,.28);
     }
 
-    .btn.primary.loto {
-      color: #ffe7a6;
-      background: linear-gradient(135deg, #7b0000, #e21b16);
-      border-color: rgba(226,27,22,0.4);
-      box-shadow: 0 0 32px rgba(226,27,22,0.34);
-    }
-
-    .btn.gold {
-      color: #160800;
-      background: linear-gradient(135deg, var(--gold), #fff0a8);
-      border: 0;
-    }
-
-    .btn.danger {
-      color: #fff;
-      background: rgba(255,85,119,0.16);
-      border-color: rgba(255,85,119,0.34);
-    }
-
-    .btn-grid {
+    .action-grid {
+      margin-top: 18px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 10px;
+      gap: 12px;
     }
 
-    .premium-lock {
-      padding: 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(244,200,74,0.25);
-      background: rgba(244,200,74,0.07);
-    }
-
-    .premium-ok {
-      display: none;
-    }
-
-    body.premium .premium-lock {
-      display: none;
-    }
-
-    body.premium .premium-ok {
-      display: block;
-    }
-
-    .stats-grid {
-      display: grid;
-      gap: 10px;
+    .action-grid.second {
+      grid-template-columns: 1fr 1fr 1fr;
       margin-top: 12px;
     }
 
-    .stat-box {
-      border: 1px solid rgba(255,255,255,0.10);
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 10px;
+      font-weight: 950;
+      font-size: 1.02rem;
+      cursor: pointer;
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #0057e6, #0094ff);
+      color: white;
+    }
+
+    .btn-premium {
+      background: linear-gradient(135deg, #a95cff, #ffd84d);
+      color: var(--text);
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 6px 16px rgba(7,27,77,.08);
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #12a85c, #18d874);
+      color: white;
+    }
+
+    .btn-dark {
+      background: var(--dark);
+      color: white;
+    }
+
+    .panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      background: linear-gradient(180deg, #f9fbff, #eef3fa);
+      color: var(--text);
+      border-radius: 30px;
+      padding: 15px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-tabs {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: #edf2f9;
+      border-radius: 22px;
+      padding: 6px;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .panel-tab {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
       border-radius: 17px;
-      padding: 13px;
-      background: rgba(0,0,0,0.20);
+      padding: 12px 4px;
+      font-weight: 950;
+      font-size: .9rem;
+      cursor: pointer;
     }
 
-    .stat-box small {
+    .panel-tab.active {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 5px 14px rgba(7,27,77,.08);
+    }
+
+    .panel-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
       display: block;
-      color: var(--soft);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-size: 0.68rem;
-      font-weight: 900;
-      margin-bottom: 6px;
     }
 
-    .chip-row {
+    .box {
+      background: #f9fbff;
+      border: 1px solid #e1e8f3;
+      border-radius: 21px;
+      padding: 16px;
+    }
+
+    .box h4 {
+      font-size: 1.32rem;
+      margin-bottom: 10px;
+      font-weight: 950;
+    }
+
+    .box p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: .98rem;
+    }
+
+    .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: 9px;
+      margin: 12px 0 10px;
     }
 
     .chip {
-      min-width: 34px;
-      height: 34px;
       border-radius: 999px;
-      display: grid;
-      place-items: center;
-      padding: 0 9px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.13);
+      padding: 10px 14px;
+      font-weight: 950;
+      background: white;
+      border: 1px solid #e0e7f3;
       color: var(--text);
-      font-weight: 900;
-      font-size: 0.82rem;
     }
 
     .chip.hot {
-      color: #ffd1d1;
-      border-color: rgba(226,27,22,0.40);
-      background: rgba(226,27,22,0.15);
+      border-color: #f7db68;
+      background: #fff9db;
     }
 
     .chip.cold {
-      color: #cfe3ff;
-      border-color: rgba(0,96,255,0.40);
-      background: rgba(0,96,255,0.14);
+      border-color: #bce5ff;
+      background: #ecf8ff;
     }
 
-    .list {
-      display: grid;
-      gap: 9px;
-      margin-top: 11px;
-    }
-
-    .item {
-      padding: 11px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.09);
-    }
-
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+    .history-item {
       color: var(--muted);
-      font-size: 0.82rem;
-      margin-bottom: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e1e8f3;
+      font-size: .98rem;
+      line-height: 1.35;
     }
 
-    .item-actions {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-      margin-top: 9px;
+    .history-item:last-child {
+      border-bottom: 0;
     }
 
-    .small-btn {
-      border-radius: 999px;
-      padding: 8px 10px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+    .clear-btn {
+      width: 100%;
+      margin-top: 12px;
+      border: 1px solid #dfe7f4;
+      border-radius: 17px;
+      padding: 14px;
+      background: white;
       color: var(--text);
-      font-weight: 850;
-      font-size: 0.78rem;
-    }
-
-    .small-btn.danger {
-      color: #ffd1dc;
-      border-color: rgba(255,85,119,0.34);
-      background: rgba(255,85,119,0.12);
-    }
-
-    .empty {
-      text-align: center;
-      padding: 13px 8px;
-      color: var(--soft);
-      line-height: 1.45;
-    }
-
-    .result-status {
       font-weight: 950;
+      font-size: 1rem;
     }
 
-    .result-status.win {
+    .gain-ok {
       color: var(--green);
-    }
-
-    .result-status.lose {
-      color: var(--danger);
-    }
-
-    .notice {
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
-      margin-top: 10px;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      bottom: calc(10px + env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      z-index: 30;
-      width: min(580px, calc(100% - 22px));
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 7px;
-      padding: 8px;
-      border-radius: 22px;
-      border: 1px solid var(--line);
-      background: rgba(7,0,18,0.92);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 18px 55px rgba(0,0,0,0.55);
-    }
-
-    .nav-btn {
-      padding: 10px 4px;
-      border-radius: 15px;
-      background: transparent;
-      color: rgba(245,238,255,0.58);
       font-weight: 950;
-      font-size: 0.74rem;
     }
 
-    .nav-btn.active {
-      color: #160800;
-      background: linear-gradient(135deg, var(--gold), #fff0a8);
+    .gain-no {
+      color: var(--danger);
+      font-weight: 950;
+    }
+
+    .footer {
+      flex: 0 0 auto;
+      color: rgba(255,255,255,.58);
+      text-align: center;
+      font-size: .83rem;
+      line-height: 1.4;
+      padding-top: 10px;
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(92px + env(safe-area-inset-bottom));
-      transform: translateX(-50%) translateY(18px);
-      z-index: 60;
-      width: min(520px, calc(100% - 26px));
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 17px;
-      padding: 13px 14px;
-      color: var(--text);
-      background: rgba(7,0,18,0.96);
-      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      z-index: 50;
+      background: var(--text);
+      color: white;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-weight: 950;
       opacity: 0;
       pointer-events: none;
-      transition: 0.24s ease;
-      line-height: 1.45;
+      transition: .25s;
+      box-shadow: var(--shadow);
+      max-width: calc(100% - 40px);
+      text-align: center;
     }
 
     .toast.show {
@@ -616,306 +520,264 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    .disclaimer {
-      text-align: center;
-      color: rgba(245,238,255,0.34);
-      font-size: 0.76rem;
-      line-height: 1.6;
-      padding: 8px 14px 0;
+    @media (max-height: 780px) {
+      .hero {
+        min-height: 150px;
+        padding-bottom: 16px;
+      }
+
+      .tagline h2 {
+        font-size: 2rem;
+      }
+
+      .tagline p {
+        display: none;
+      }
+
+      .main-card {
+        padding: 14px;
+      }
+
+      .ball {
+        width: 46px;
+        height: 46px;
+        font-size: 1.08rem;
+      }
+
+      .extra-ball {
+        width: 48px;
+        height: 48px;
+      }
+
+      .btn {
+        padding: 13px 8px;
+        font-size: .95rem;
+      }
     }
 
-    .disclaimer strong {
-      color: var(--gold);
-    }
-
-    @media (max-width: 430px) {
+    @media (max-width: 420px) {
       .app {
         padding-left: 10px;
         padding-right: 10px;
       }
 
-      .ball {
-        width: 48px;
-        height: 48px;
+      .hero {
+        margin-left: -10px;
+        margin-right: -10px;
       }
 
-      .ball.extra {
+      .brand h1 {
+        font-size: 1.35rem;
+      }
+
+      .brand p {
+        font-size: .82rem;
+      }
+
+      .smart-badge {
+        padding: 10px 13px;
+      }
+
+      .ball {
         width: 44px;
         height: 44px;
       }
 
-      .btn-grid {
-        grid-template-columns: 1fr;
+      .extra-ball {
+        width: 48px;
+        height: 48px;
       }
 
-      h1 {
-        letter-spacing: 2px;
+      .action-grid.second {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+
+      .btn {
+        font-size: .9rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="stars" id="stars"></div>
+  <div class="stars"></div>
 
   <main class="app">
-    <header class="header" id="top">
-      <span class="logo">🦁</span>
-      <h1>GALACTIC LOTTERY</h1>
-      <div class="subtitle">Free · Premium · Timer · Stats</div>
+    <header class="hero">
+      <div class="topbar">
+        <div class="brand">
+          <div class="app-icon">🪐</div>
+          <div>
+            <h1>GALACTIC</h1>
+            <p>Euromillions · Loto</p>
+          </div>
+        </div>
 
-      <div class="top-actions">
-        <button class="pill-btn gold" id="installBtn">Installer</button>
-        <button class="pill-btn" id="premiumTopBtn">Premium</button>
+        <button class="smart-badge" id="smartBtn">Smart</button>
+      </div>
+
+      <div class="tagline">
+        <small>Ce soir, tente ta grille</small>
+        <h2>Générateur Premium</h2>
+        <strong>Classique + Smart+</strong>
+        <p>Grille classique ou Premium calculée en privé. Sans promesse de gain.</p>
       </div>
     </header>
 
-    <section class="tabs">
-      <button class="tab active euro" id="tabEuro">⭐ EuroMillions</button>
-      <button class="tab" id="tabLoto">🎱 Loto</button>
+    <section class="game-tabs">
+      <button class="game-tab active" id="euroBtn">⭐ EuroMillions</button>
+      <button class="game-tab" id="lotoBtn">🎱 Loto</button>
     </section>
 
-    <section class="card" id="timerSection">
-      <div class="card-title">
-        <h2>⏳ Timer tirage</h2>
-        <small id="drawGameLabel">EuroMillions</small>
+    <section class="main-card">
+      <div class="card-head">
+        <div>
+          <h3 id="gameTitle">EuroMillions</h3>
+          <p class="draw-text" id="drawText">Prochain tirage : calcul…</p>
+        </div>
+        <div class="badge" id="formatBadge">5 + 2</div>
       </div>
 
-      <div class="timer-box">
-        <div class="timer-label">Temps restant indicatif</div>
-        <div class="timer" id="countdown">--:--:--</div>
-        <p class="timer-note" id="nextDrawText">Calcul du prochain tirage…</p>
+      <div class="countdown">
+        <div class="time-box"><strong id="d">0</strong><small>JOURS</small></div>
+        <div class="time-box"><strong id="h">0</strong><small>HEURES</small></div>
+        <div class="time-box"><strong id="m">0</strong><small>MIN</small></div>
+        <div class="time-box"><strong id="s">0</strong><small>SEC</small></div>
       </div>
 
-      <label>
-        Modifier l’heure du tirage
-        <input type="datetime-local" id="drawInput" />
-      </label>
+      <div class="label">NUMÉROS</div>
+      <div class="balls" id="mainBalls"></div>
 
-      <div class="btn-grid">
-        <button class="btn gold" id="saveDrawBtn">Enregistrer timer</button>
-        <button class="btn" id="resetDrawBtn">Auto</button>
+      <div class="label" id="extraLabel">ÉTOILES</div>
+      <div class="balls" id="extraBalls"></div>
+
+      <div class="action-grid">
+        <button class="btn btn-blue" id="classicBtn">🎲 Classique</button>
+        <button class="btn btn-premium" id="premiumBtn">✨ Premium</button>
       </div>
 
-      <p class="notice">
-        Le timer est pratique avant d’aller jouer, mais vérifie toujours l’heure officielle avant validation.
-      </p>
-    </section>
-
-    <section class="card" id="generator">
-      <div class="card-title">
-        <h2>🔮 Générateur Free</h2>
-        <small id="generatorLabel">5 numéros + 2 étoiles</small>
-      </div>
-
-      <div class="balls-area" id="ballsArea">
-        <div class="balls-row" id="mainBalls"></div>
-        <div class="extra-label" id="extraLabel">Étoiles</div>
-        <div class="balls-row" id="extraBalls"></div>
-      </div>
-
-      <div class="analysis" id="analysis">
-        <small id="analysisTitle">Analyse</small>
-        <p id="analysisText"></p>
+      <div class="action-grid second">
+        <button class="btn btn-white" id="copyBtn">📋 Copier</button>
+        <button class="btn btn-green" id="waBtn">WhatsApp</button>
+        <button class="btn btn-dark" id="verifyBtn">🔎 Vérifier</button>
       </div>
     </section>
 
-    <button class="btn primary euro" id="generateBtn">🎲 Générer une grille Free</button>
-
-    <div class="btn-grid">
-      <button class="btn gold" id="saveCurrentBtn">⭐ Favori</button>
-      <button class="btn" id="copyCurrentBtn">Copier</button>
-    </div>
-
-    <section class="card" id="premium">
-      <div class="card-title">
-        <h2>👑 Premium</h2>
-        <small>Code : galactic2026</small>
+    <section class="panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-tab="tirage">Tirage</button>
+        <button class="panel-tab" data-tab="gain">Gain</button>
+        <button class="panel-tab" data-tab="stats">Stats</button>
+        <button class="panel-tab" data-tab="history">Historique</button>
       </div>
 
-      <div class="premium-lock">
-        <p class="notice" style="margin-top:0;">
-          Débloque le mode Premium pour retrouver les stats chaud/froid, score statistique,
-          équilibre pair/impair, petits/grands numéros et génération avancée.
-        </p>
-
-        <label>
-          Code Premium
-          <input id="premiumCode" placeholder="Entre le code premium" />
-        </label>
-
-        <button class="btn gold" id="unlockBtn">Débloquer Premium</button>
-      </div>
-
-      <div class="premium-ok">
-        <p class="notice" style="margin-top:0;color:var(--green);font-weight:850;">
-          Premium activé ✅
-        </p>
-
-        <div class="btn-grid">
-          <button class="btn gold" id="premiumGenerateBtn">Générer Premium</button>
-          <button class="btn" id="premiumBatchBtn">5 grilles Premium</button>
+      <div class="panel-content">
+        <div class="section active" id="tirage">
+          <div class="box">
+            <h4>🏆 Tirage de référence</h4>
+            <p id="referenceText"></p>
+            <div class="chips" id="referenceChips"></div>
+            <button class="clear-btn" id="editReferenceBtn">Modifier le résultat</button>
+          </div>
         </div>
 
-        <div class="stats-grid" id="premiumStats"></div>
-      </div>
-    </section>
-
-    <section class="card" id="stats">
-      <div class="card-title">
-        <h2>🔥 Chaud / Froid</h2>
-        <small>Selon tes données</small>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <small>Numéros chauds</small>
-          <div class="chip-row" id="hotNumbers"></div>
+        <div class="section" id="gain">
+          <div class="box">
+            <h4>💰 Gain remporté ou pas</h4>
+            <p id="gainText">Génère une grille puis appuie sur “Vérifier”.</p>
+          </div>
         </div>
 
-        <div class="stat-box">
-          <small>Numéros froids</small>
-          <div class="chip-row" id="coldNumbers"></div>
+        <div class="section" id="stats">
+          <div class="box">
+            <h4>📊 Statistiques Smart+</h4>
+            <p>Numéros les plus sortis / favorisés localement</p>
+            <div class="chips" id="hotChips"></div>
+
+            <p style="margin-top:12px;">Numéros les moins sortis / froids</p>
+            <div class="chips" id="coldChips"></div>
+
+            <p id="smartScoreText" style="margin-top:12px;"></p>
+          </div>
+        </div>
+
+        <div class="section" id="history">
+          <div class="box">
+            <h4>📜 Historique</h4>
+            <div id="historyList"></div>
+            <button class="clear-btn" id="clearHistoryBtn">🧹 Effacer</button>
+          </div>
         </div>
       </div>
-
-      <p class="notice" id="statsSource">
-        Les numéros chauds/froids sont calculés avec tes résultats saisis et ton historique local.
-      </p>
     </section>
 
-    <section class="card" id="results">
-      <div class="card-title">
-        <h2>🏆 Résultat</h2>
-        <small>Gagné ou pas gagné</small>
-      </div>
-
-      <label>
-        Numéros officiels
-        <input id="resultMain" placeholder="Ex : 7 13 24 38 49" />
-      </label>
-
-      <label>
-        Étoiles / Chance
-        <input id="resultExtra" placeholder="Ex : 3 11" />
-      </label>
-
-      <button class="btn gold" id="checkResultBtn">Contrôler mes grilles</button>
-
-      <div class="list" id="resultList">
-        <div class="empty">Entre le résultat officiel après tirage pour vérifier tes grilles.</div>
-      </div>
-
-      <p class="notice">
-        Contrôle indicatif. Pour un paiement ou une validation réelle, vérifie toujours sur le reçu ou la source officielle.
-      </p>
-    </section>
-
-    <section class="card" id="history">
-      <div class="card-title">
-        <h2>📜 Historique</h2>
-        <small>Session locale</small>
-      </div>
-
-      <div class="list" id="historyList">
-        <div class="empty">Aucune grille générée.</div>
-      </div>
-    </section>
-
-    <section class="card" id="favorites">
-      <div class="card-title">
-        <h2>⭐ Favoris</h2>
-        <small>Sur ton téléphone</small>
-      </div>
-
-      <div class="btn-grid">
-        <button class="btn" id="exportBtn">Exporter</button>
-        <button class="btn danger" id="clearFavBtn">Vider favoris</button>
-      </div>
-
-      <div class="list" id="favoritesList">
-        <div class="empty">Aucun favori.</div>
-      </div>
-    </section>
-
-    <section class="card" id="pwa">
-      <div class="card-title">
-        <h2>📱 PWA</h2>
-        <small>Installation</small>
-      </div>
-
-      <p class="notice" id="pwaStatus">Vérification…</p>
-    </section>
-
-    <p class="disclaimer">
-      <strong>Galactic Lottery est indépendante et non affiliée à la FDJ.</strong><br>
-      Les grilles sont générées aléatoirement. Les analyses Premium sont statistiques et divertissantes.
-      Aucun score, IA, méthode ou algorithme ne garantit un gain.
+    <p class="footer">
+      Application indépendante, non affiliée à la FDJ.<br>
+      Les numéros sont générés aléatoirement. Version V6.4 Smart+
     </p>
   </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-target="top">Accueil</button>
-    <button class="nav-btn" data-target="premium">Premium</button>
-    <button class="nav-btn" data-target="results">Résultat</button>
-    <button class="nav-btn" data-target="favorites">Favoris</button>
-  </nav>
 
   <div class="toast" id="toast"></div>
 
   <script>
     const PREMIUM_CODE = "galactic2026";
-    const STORAGE_KEY = "galacticLotteryRecoveryPremiumV13";
-    const APP_VERSION = "1.3.0";
+    const STORAGE_KEY = "galactic_lottery_v64_smart_plus";
 
     const CONFIG = {
       euro: {
-        label: "EuroMillions",
-        mainCount: 5,
-        mainMax: 50,
-        extraCount: 2,
-        extraMax: 12,
-        extraLabel: "Étoiles",
+        name: "EuroMillions",
         icon: "⭐",
+        format: "5 + 2",
+        mainMax: 50,
+        mainCount: 5,
+        extraMax: 12,
+        extraCount: 2,
+        extraName: "ÉTOILES",
         drawDays: [2, 5],
-        hour: 20,
-        minute: 30
+        drawHour: 21,
+        drawMinute: 5,
+        referenceMain: [18, 25, 31, 37, 45],
+        referenceExtra: [4, 9],
+        hotDefault: [30, 31, 24, 7, 41],
+        coldDefault: [43, 1, 33, 46, 8]
       },
       loto: {
-        label: "Loto",
-        mainCount: 5,
-        mainMax: 49,
-        extraCount: 1,
-        extraMax: 10,
-        extraLabel: "Numéro Chance",
+        name: "Loto",
         icon: "🎱",
+        format: "5 + 1",
+        mainMax: 49,
+        mainCount: 5,
+        extraMax: 10,
+        extraCount: 1,
+        extraName: "NUMÉRO CHANCE",
         drawDays: [1, 3, 6],
-        hour: 20,
-        minute: 30
+        drawHour: 20,
+        drawMinute: 20,
+        referenceMain: [1, 15, 32, 37, 39],
+        referenceExtra: [1],
+        hotDefault: [7, 24, 30, 31, 41],
+        coldDefault: [1, 8, 33, 43, 46]
       }
     };
 
     let game = "euro";
     let currentGrid = null;
-    let deferredInstallPrompt = null;
-
     let state = loadState();
 
-    const $ = (selector) => document.querySelector(selector);
-    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
 
     init();
 
     function init() {
-      createStars();
-      bindEvents();
-      applyPremiumState();
-      renderDefaultBalls();
-      setDrawInput();
-      renderAll();
-      startTimer();
-      registerServiceWorker();
-      initInstallPrompt();
+      bind();
+      renderGame();
+      renderHistory();
+      renderStats();
+      updateTimer();
+      setInterval(updateTimer, 1000);
+      registerSW();
     }
 
     function loadState() {
@@ -925,28 +787,21 @@
           return {
             premium: false,
             history: [],
-            favorites: [],
-            results: [],
-            customDraws: {}
+            references: {}
           };
         }
 
-        const parsed = JSON.parse(raw);
-
+        const data = JSON.parse(raw);
         return {
-          premium: Boolean(parsed.premium),
-          history: Array.isArray(parsed.history) ? parsed.history : [],
-          favorites: Array.isArray(parsed.favorites) ? parsed.favorites : [],
-          results: Array.isArray(parsed.results) ? parsed.results : [],
-          customDraws: parsed.customDraws || {}
+          premium: Boolean(data.premium),
+          history: Array.isArray(data.history) ? data.history : [],
+          references: data.references || {}
         };
       } catch {
         return {
           premium: false,
           history: [],
-          favorites: [],
-          results: [],
-          customDraws: {}
+          references: {}
         };
       }
     }
@@ -955,323 +810,474 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function bindEvents() {
-      $("#tabEuro").addEventListener("click", () => switchGame("euro"));
-      $("#tabLoto").addEventListener("click", () => switchGame("loto"));
-      $("#generateBtn").addEventListener("click", () => generateGrid("free"));
-      $("#saveCurrentBtn").addEventListener("click", saveCurrent);
-      $("#copyCurrentBtn").addEventListener("click", copyCurrent);
-      $("#unlockBtn").addEventListener("click", unlockPremium);
-      $("#premiumGenerateBtn").addEventListener("click", () => generateGrid("premium"));
-      $("#premiumBatchBtn").addEventListener("click", premiumBatch);
-      $("#checkResultBtn").addEventListener("click", checkResults);
-      $("#exportBtn").addEventListener("click", exportFavorites);
-      $("#clearFavBtn").addEventListener("click", clearFavorites);
-      $("#saveDrawBtn").addEventListener("click", saveCustomDraw);
-      $("#resetDrawBtn").addEventListener("click", resetCustomDraw);
-      $("#installBtn").addEventListener("click", installApp);
-      $("#premiumTopBtn").addEventListener("click", () => scrollToId("premium"));
+    function bind() {
+      $("#euroBtn").onclick = () => switchGame("euro");
+      $("#lotoBtn").onclick = () => switchGame("loto");
 
-      $$(".nav-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-          scrollToId(button.dataset.target);
-          $$(".nav-btn").forEach((item) => item.classList.remove("active"));
-          button.classList.add("active");
-        });
+      $("#classicBtn").onclick = () => generateClassic();
+      $("#premiumBtn").onclick = () => generatePremium();
+      $("#smartBtn").onclick = () => unlockPremium();
+
+      $("#copyBtn").onclick = copyGrid;
+      $("#waBtn").onclick = shareWhatsapp;
+      $("#verifyBtn").onclick = verifyGrid;
+
+      $("#editReferenceBtn").onclick = editReference;
+      $("#clearHistoryBtn").onclick = clearHistory;
+
+      $$(".panel-tab").forEach(btn => {
+        btn.onclick = () => {
+          $$(".panel-tab").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          $$(".section").forEach(s => s.classList.remove("active"));
+          $("#" + btn.dataset.tab).classList.add("active");
+        };
       });
     }
 
-    function createStars() {
-      const wrap = $("#stars");
-
-      for (let i = 0; i < 130; i++) {
-        const star = document.createElement("div");
-        const size = Math.random() * 2.5 + 0.5;
-
-        star.className = "star";
-        star.style.cssText = `
-          left:${Math.random() * 100}%;
-          top:${Math.random() * 100}%;
-          width:${size}px;
-          height:${size}px;
-          --d:${(Math.random() * 4 + 1).toFixed(1)}s;
-          animation-delay:${(Math.random() * 5).toFixed(1)}s;
-          opacity:${Math.random() * 0.5};
-        `;
-
-        wrap.appendChild(star);
-      }
+    function switchGame(next) {
+      game = next;
+      $("#euroBtn").classList.toggle("active", game === "euro");
+      $("#lotoBtn").classList.toggle("active", game === "loto");
+      renderGame();
+      renderStats();
+      renderHistory();
+      updateTimer();
     }
 
-    function switchGame(nextGame) {
-      game = nextGame;
-      currentGrid = null;
+    function renderGame() {
+      const c = CONFIG[game];
 
-      $("#tabEuro").className = "tab" + (game === "euro" ? " active euro" : "");
-      $("#tabLoto").className = "tab" + (game === "loto" ? " active loto" : "");
+      $("#gameTitle").textContent = c.name;
+      $("#formatBadge").textContent = c.format;
+      $("#extraLabel").textContent = c.extraName;
 
-      $("#generateBtn").className = `btn primary ${game}`;
-      $("#ballsArea").className = `balls-area ${game}`;
-
-      $("#analysis").classList.remove("show");
-
-      renderDefaultBalls();
-      setDrawInput();
-      renderAll();
-    }
-
-    function renderDefaultBalls() {
-      const config = CONFIG[game];
-
-      $("#mainBalls").innerHTML = "";
-      $("#extraBalls").innerHTML = "";
-
-      for (let i = 0; i < config.mainCount; i++) {
-        const ball = document.createElement("div");
-        ball.className = "ball main show";
-        ball.textContent = "?";
-        $("#mainBalls").appendChild(ball);
+      if (!currentGrid || currentGrid.game !== game) {
+        currentGrid = buildClassicGrid();
       }
 
-      for (let i = 0; i < config.extraCount; i++) {
-        const ball = document.createElement("div");
-        ball.className = "ball extra show";
-        ball.textContent = "?";
-        $("#extraBalls").appendChild(ball);
-      }
-
-      $("#extraLabel").textContent = config.extraLabel;
-      $("#generatorLabel").textContent = `${config.mainCount} numéros + ${config.extraCount} ${config.extraLabel.toLowerCase()}`;
-      $("#drawGameLabel").textContent = config.label;
+      renderBalls(currentGrid);
+      renderReference();
+      renderSmartBadge();
     }
 
-    async function generateGrid(type) {
-      const config = CONFIG[game];
-      const button = type === "premium" ? $("#premiumGenerateBtn") : $("#generateBtn");
+    function renderSmartBadge() {
+      $("#smartBtn").textContent = state.premium ? "Smart+" : "Smart";
+    }
 
-      if (type === "premium" && !state.premium) {
-        toast("Débloque Premium avec le code.");
+    function renderBalls(grid) {
+      $("#mainBalls").innerHTML = grid.main.map(n => `<div class="ball">${n}</div>`).join("");
+      $("#extraBalls").innerHTML = grid.extra.map(n => `<div class="ball extra-ball">${n}</div>`).join("");
+    }
+
+    function getReference() {
+      const c = CONFIG[game];
+      const saved = state.references[game];
+
+      if (saved) return saved;
+
+      return {
+        main: c.referenceMain,
+        extra: c.referenceExtra
+      };
+    }
+
+    function renderReference() {
+      const c = CONFIG[game];
+      const ref = getReference();
+
+      $("#referenceText").textContent =
+        `${c.name} · résultat de référence`;
+
+      $("#referenceChips").innerHTML =
+        ref.main.map(n => `<span class="chip">${n}</span>`).join("") +
+        ref.extra.map(n => `<span class="chip hot">${n}</span>`).join("");
+    }
+
+    function buildClassicGrid() {
+      const c = CONFIG[game];
+
+      return {
+        id: makeId(),
+        game,
+        type: "Classique",
+        main: pickUnique(1, c.mainMax, c.mainCount),
+        extra: pickUnique(1, c.extraMax, c.extraCount),
+        score: 0,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function generateClassic() {
+      currentGrid = buildClassicGrid();
+      currentGrid.score = scoreGrid(currentGrid).score;
+      saveHistory(currentGrid);
+      renderBalls(currentGrid);
+      renderHistory();
+      renderStats();
+      toast("Grille classique générée 🎲");
+    }
+
+    function generatePremium() {
+      if (!state.premium) {
+        unlockPremium(() => generatePremium());
         return;
       }
 
-      button.disabled = true;
-      button.textContent = type === "premium" ? "Calcul Premium…" : "Génération…";
-
-      $$(".ball").forEach((ball) => {
-        ball.classList.remove("show");
-        ball.textContent = "?";
-      });
-
-      await sleep(350);
-
-      const grid = type === "premium"
-        ? buildPremiumGrid()
-        : buildRandomGrid();
-
-      currentGrid = {
-        id: makeId(),
-        game,
-        type,
-        main: grid.main,
-        extra: grid.extra,
-        score: grid.score || scoreGrid(grid.main, grid.extra).score,
-        details: grid.details || scoreGrid(grid.main, grid.extra).details,
-        createdAt: new Date().toISOString()
-      };
-
-      const mainBalls = $$("#mainBalls .ball");
-      const extraBalls = $$("#extraBalls .ball");
-
-      for (let i = 0; i < mainBalls.length; i++) {
-        await sleep(120);
-        mainBalls[i].textContent = currentGrid.main[i];
-        mainBalls[i].classList.add("show");
-      }
-
-      await sleep(180);
-
-      for (let i = 0; i < extraBalls.length; i++) {
-        await sleep(140);
-        extraBalls[i].textContent = currentGrid.extra[i];
-        extraBalls[i].classList.add("show");
-      }
-
-      showAnalysis(currentGrid);
-
-      state.history.unshift(currentGrid);
-      state.history = state.history.slice(0, 80);
-      saveState();
-
-      renderAll();
-
-      button.disabled = false;
-      button.textContent = type === "premium" ? "Générer Premium" : "🎲 Générer une grille Free";
-    }
-
-    function buildRandomGrid() {
-      const config = CONFIG[game];
-
-      return {
-        main: pickUnique(1, config.mainMax, config.mainCount),
-        extra: pickUnique(1, config.extraMax, config.extraCount)
-      };
-    }
-
-    function buildPremiumGrid() {
       let best = null;
 
-      for (let i = 0; i < 120; i++) {
-        const candidate = buildRandomGrid();
-        const scored = scoreGrid(candidate.main, candidate.extra);
+      for (let i = 0; i < 450; i++) {
+        const candidate = buildClassicGrid();
+        candidate.type = "Premium";
+        const result = scoreGrid(candidate);
+        candidate.score = result.score;
+        candidate.reason = result.reason;
 
-        const full = {
-          ...candidate,
-          score: scored.score,
-          details: scored.details
-        };
-
-        if (!best || full.score > best.score) {
-          best = full;
+        if (!best || candidate.score > best.score) {
+          best = candidate;
         }
       }
 
-      return best;
+      currentGrid = best;
+      saveHistory(currentGrid);
+      renderBalls(currentGrid);
+      renderHistory();
+      renderStats();
+      toast("Grille Premium générée ✨");
     }
 
-    function premiumBatch() {
-      if (!state.premium) {
-        toast("Débloque Premium avec le code.");
-        return;
-      }
+    function scoreGrid(grid) {
+      const c = CONFIG[grid.game];
+      const profile = getProfile(grid.game);
 
-      const created = [];
+      let score = 35;
+      const reason = [];
 
-      for (let i = 0; i < 5; i++) {
-        const grid = buildPremiumGrid();
+      const odds = grid.main.filter(n => n % 2 !== 0).length;
+      const lows = grid.main.filter(n => n <= Math.floor(c.mainMax / 2)).length;
+      const sum = grid.main.reduce((a, b) => a + b, 0);
 
-        created.push({
-          id: makeId(),
-          game,
-          type: "premium",
-          main: grid.main,
-          extra: grid.extra,
-          score: grid.score,
-          details: grid.details,
-          createdAt: new Date().toISOString()
-        });
-      }
-
-      currentGrid = created[0];
-      state.history = [...created, ...state.history].slice(0, 80);
-      saveState();
-
-      renderCurrentBalls(currentGrid);
-      showAnalysis(currentGrid);
-      renderAll();
-      toast("5 grilles Premium générées.");
-    }
-
-    function scoreGrid(main, extra) {
-      const config = CONFIG[game];
-      const profile = buildProfile(game);
-      let score = 40;
-      const details = [];
-
-      const odd = main.filter((n) => n % 2 !== 0).length;
-      const low = main.filter((n) => n <= Math.floor(config.mainMax / 2)).length;
-      const sum = main.reduce((a, b) => a + b, 0);
       const gaps = [];
-
-      for (let i = 1; i < main.length; i++) {
-        gaps.push(main[i] - main[i - 1]);
+      for (let i = 1; i < grid.main.length; i++) {
+        gaps.push(grid.main[i] - grid.main[i - 1]);
       }
 
-      const consecutive = gaps.filter((g) => g === 1).length;
+      const consecutive = gaps.filter(g => g === 1).length;
       const averageGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
 
-      if (odd === 2 || odd === 3) {
+      if (odds === 2 || odds === 3) {
         score += 14;
-        details.push("pair/impair équilibré");
+        reason.push("équilibre pair/impair");
       }
 
-      if (low === 2 || low === 3) {
+      if (lows === 2 || lows === 3) {
         score += 14;
-        details.push("petits/grands équilibrés");
+        reason.push("équilibre petits/grands");
       }
 
-      const targetMin = game === "euro" ? 115 : 105;
-      const targetMax = game === "euro" ? 170 : 165;
+      const minSum = grid.game === "euro" ? 115 : 105;
+      const maxSum = grid.game === "euro" ? 175 : 165;
 
-      if (sum >= targetMin && sum <= targetMax) {
+      if (sum >= minSum && sum <= maxSum) {
         score += 16;
-        details.push("somme cohérente");
+        reason.push("somme cohérente");
       }
 
       if (consecutive <= 1) {
         score += 8;
-        details.push("peu de suites directes");
+        reason.push("peu de suites");
       }
 
       if (averageGap >= 5) {
         score += 8;
-        details.push("écarts corrects");
+        reason.push("écarts corrects");
       }
 
-      if (profile.hasData) {
-        const hotHits = main.filter((n) => profile.hot.includes(n)).length;
-        const coldHits = main.filter((n) => profile.cold.includes(n)).length;
+      const hotHits = grid.main.filter(n => profile.hot.includes(n)).length;
+      const coldHits = grid.main.filter(n => profile.cold.includes(n)).length;
 
-        if (hotHits >= 1 && hotHits <= 3) {
-          score += 10;
-          details.push("présence de numéros chauds");
-        }
+      if (hotHits >= 1 && hotHits <= 3) {
+        score += 12;
+        reason.push("mix numéros chauds");
+      }
 
-        if (coldHits >= 1 && coldHits <= 2) {
-          score += 8;
-          details.push("mix avec numéros froids");
-        }
+      if (coldHits >= 1 && coldHits <= 2) {
+        score += 7;
+        reason.push("mix numéros froids");
+      }
+
+      const repetitionPenalty = countSimilarHistory(grid);
+      score -= repetitionPenalty * 5;
+
+      if (repetitionPenalty === 0) {
+        reason.push("faible répétition historique");
       }
 
       return {
-        score: Math.min(99, score),
-        details
+        score: Math.max(1, Math.min(99, score)),
+        reason
       };
     }
 
-    function showAnalysis(grid) {
-      const config = CONFIG[grid.game];
-      const title = grid.type === "premium"
-        ? "Analyse Premium"
-        : "Analyse Free";
-
-      const scoreText = state.premium || grid.type === "premium"
-        ? `Score statistique interne : ${grid.score}/99. `
-        : "";
-
-      const details = grid.details && grid.details.length
-        ? grid.details.join(", ")
-        : "grille générée aléatoirement";
-
-      $("#analysisTitle").textContent = title;
-      $("#analysisText").textContent =
-        `${scoreText}${config.label} : ${grid.main.join(" - ")} | ${config.extraLabel} : ${grid.extra.join(" - ")}. Méthode : ${details}. Aucun gain garanti.`;
-
-      $("#analysis").classList.add("show");
+    function countSimilarHistory(grid) {
+      return state.history.filter(item => {
+        if (item.game !== grid.game) return false;
+        const matches = item.main.filter(n => grid.main.includes(n)).length;
+        return matches >= 3;
+      }).length;
     }
 
-    function renderCurrentBalls(grid) {
-      const mainBalls = $$("#mainBalls .ball");
-      const extraBalls = $$("#extraBalls .ball");
+    function getProfile(profileGame) {
+      const c = CONFIG[profileGame];
+      const counts = new Map();
 
-      mainBalls.forEach((ball, index) => {
-        ball.textContent = grid.main[index] || "?";
-        ball.classList.add("show");
+      for (let i = 1; i <= c.mainMax; i++) counts.set(i, 0);
+
+      const history = state.history.filter(g => g.game === profileGame);
+      const ref = state.references[profileGame] || {
+        main: c.referenceMain,
+        extra: c.referenceExtra
+      };
+
+      ref.main.forEach(n => counts.set(n, (counts.get(n) || 0) + 3));
+      history.forEach(g => g.main.forEach(n => counts.set(n, (counts.get(n) || 0) + 1)));
+
+      const hot = [...counts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0] - b[0])
+        .slice(0, 5)
+        .map(([n]) => n);
+
+      const cold = [...counts.entries()]
+        .sort((a, b) => a[1] - b[1] || a[0] - b[0])
+        .slice(0, 5)
+        .map(([n]) => n);
+
+      return {
+        hot: hot.length ? hot : c.hotDefault,
+        cold: cold.length ? cold : c.coldDefault
+      };
+    }
+
+    function renderStats() {
+      const profile = getProfile(game);
+
+      $("#hotChips").innerHTML = profile.hot.map(n => `<span class="chip hot">🔥 ${n}</span>`).join("");
+      $("#coldChips").innerHTML = profile.cold.map(n => `<span class="chip cold">❄️ ${n}</span>`).join("");
+
+      if (currentGrid && currentGrid.game === game) {
+        const scored = scoreGrid(currentGrid);
+        $("#smartScoreText").textContent =
+          `Score Smart+ de la grille actuelle : ${scored.score}/99 · ${scored.reason.slice(0, 3).join(", ") || "analyse locale"}.`;
+      } else {
+        $("#smartScoreText").textContent = "Génère une grille pour afficher le score Smart+.";
+      }
+    }
+
+    function verifyGrid() {
+      if (!currentGrid || currentGrid.game !== game) {
+        toast("Génère d’abord une grille.");
+        return;
+      }
+
+      const c = CONFIG[game];
+      const ref = getReference();
+
+      const mainHits = currentGrid.main.filter(n => ref.main.includes(n)).length;
+      const extraHits = currentGrid.extra.filter(n => ref.extra.includes(n)).length;
+
+      let possible = false;
+
+      if (game === "euro") {
+        possible = mainHits >= 2 || (mainHits >= 1 && extraHits >= 2);
+      } else {
+        possible = mainHits >= 2 || extraHits >= 1;
+      }
+
+      $("#gainText").innerHTML = `
+        <span class="${possible ? "gain-ok" : "gain-no"}">
+          ${possible ? "✅ Potentiellement gagnant" : "❌ Pas gagnant indicatif"}
+        </span><br>
+        ${mainHits} numéro(s) trouvé(s)<br>
+        ${extraHits} ${c.extraName.toLowerCase()} trouvé(s)<br>
+        Montant exact à vérifier sur FDJ ou sur ton reçu.
+      `;
+
+      openTab("gain");
+      toast("Vérification terminée 🔎");
+    }
+
+    function openTab(id) {
+      $$(".panel-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+      $$(".section").forEach(s => s.classList.toggle("active", s.id === id));
+    }
+
+    function saveHistory(grid) {
+      state.history.unshift({
+        ...grid,
+        createdAt: new Date().toISOString()
       });
 
-      extraBalls.forEach((ball, index) => {
-        ball.textContent = grid.extra[index] || "?";
-        ball.classList.add("show");
-      });
+      state.history = state.history.slice(0, 40);
+      saveState();
+    }
+
+    function renderHistory() {
+      const items = state.history;
+
+      if (!items.length) {
+        $("#historyList").innerHTML = `<p style="color:#6c7280;">Aucune grille pour le moment.</p>`;
+        return;
+      }
+
+      $("#historyList").innerHTML = items.map(g => {
+        const c = CONFIG[g.game];
+        const icon = g.type === "Premium" ? "✨" : "🎲";
+
+        return `
+          <div class="history-item">
+            ${icon} ${g.type} · ${c.name} : ${g.main.join(" - ")} | ${g.extra.join(" - ")}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function clearHistory() {
+      if (!confirm("Effacer l’historique ?")) return;
+      state.history = [];
+      saveState();
+      renderHistory();
+      renderStats();
+      toast("Historique effacé");
+    }
+
+    function editReference() {
+      const c = CONFIG[game];
+      const mainRaw = prompt(`Entre les ${c.mainCount} numéros officiels séparés par espace`, c.referenceMain.join(" "));
+      if (!mainRaw) return;
+
+      const extraRaw = prompt(`Entre ${c.extraCount} ${c.extraName.toLowerCase()} séparé(s) par espace`, c.referenceExtra.join(" "));
+      if (!extraRaw) return;
+
+      const main = parseNums(mainRaw, c.mainCount, c.mainMax);
+      const extra = parseNums(extraRaw, c.extraCount, c.extraMax);
+
+      if (!main || !extra) {
+        toast("Format incorrect");
+        return;
+      }
+
+      state.references[game] = { main, extra };
+      saveState();
+      renderReference();
+      renderStats();
+      toast("Résultat de référence modifié");
+    }
+
+    function parseNums(raw, count, max) {
+      const nums = raw
+        .split(/[\s,;.-]+/)
+        .map(v => Number(v.trim()))
+        .filter(Number.isInteger);
+
+      const unique = [...new Set(nums)].sort((a, b) => a - b);
+
+      if (unique.length !== count) return null;
+      if (unique.some(n => n < 1 || n > max)) return null;
+
+      return unique;
+    }
+
+    function copyGrid() {
+      if (!currentGrid) return toast("Aucune grille à copier.");
+      const c = CONFIG[currentGrid.game];
+      const text = `${c.name} : ${currentGrid.main.join(" - ")} | ${c.extraName} : ${currentGrid.extra.join(" - ")} — Aucun gain garanti.`;
+      navigator.clipboard.writeText(text).then(() => toast("Grille copiée 📋")).catch(() => toast(text));
+    }
+
+    function shareWhatsapp() {
+      if (!currentGrid) return toast("Aucune grille à partager.");
+      const c = CONFIG[currentGrid.game];
+      const text = encodeURIComponent(`${c.name} : ${currentGrid.main.join(" - ")} | ${c.extraName} : ${currentGrid.extra.join(" - ")}\nGénéré avec Galactic Lottery. Aucun gain garanti.`);
+      window.open(`https://wa.me/?text=${text}`, "_blank");
+    }
+
+    function unlockPremium(callback) {
+      if (state.premium) {
+        toast("Smart+ déjà activé");
+        if (typeof callback === "function") callback();
+        return;
+      }
+
+      const code = prompt("Code Premium");
+      if (!code) return;
+
+      if (code.trim().toLowerCase() !== PREMIUM_CODE) {
+        toast("Code Premium incorrect");
+        return;
+      }
+
+      state.premium = true;
+      saveState();
+      renderSmartBadge();
+      toast("Smart+ activé ✅");
+
+      if (typeof callback === "function") setTimeout(callback, 300);
+    }
+
+    function updateTimer() {
+      const c = CONFIG[game];
+      const next = getNextDraw();
+      const diff = next.getTime() - Date.now();
+
+      if (diff <= 0) {
+        $("#d").textContent = "0";
+        $("#h").textContent = "0";
+        $("#m").textContent = "0";
+        $("#s").textContent = "0";
+        return;
+      }
+
+      const total = Math.floor(diff / 1000);
+      const days = Math.floor(total / 86400);
+      const hours = Math.floor((total % 86400) / 3600);
+      const minutes = Math.floor((total % 3600) / 60);
+      const seconds = total % 60;
+
+      $("#d").textContent = days;
+      $("#h").textContent = hours;
+      $("#m").textContent = minutes;
+      $("#s").textContent = seconds;
+
+      $("#drawText").textContent = `Prochain tirage : ${formatDrawDate(next)} vers ${pad(c.drawHour)}:${pad(c.drawMinute)}`;
+    }
+
+    function getNextDraw() {
+      const c = CONFIG[game];
+      const now = new Date();
+
+      for (let add = 0; add < 10; add++) {
+        const d = new Date(now);
+        d.setDate(now.getDate() + add);
+        d.setHours(c.drawHour, c.drawMinute, 0, 0);
+
+        if (c.drawDays.includes(d.getDay()) && d.getTime() > now.getTime()) {
+          return d;
+        }
+      }
+
+      const fallback = new Date(now);
+      fallback.setDate(now.getDate() + 1);
+      fallback.setHours(c.drawHour, c.drawMinute, 0, 0);
+      return fallback;
+    }
+
+    function formatDrawDate(date) {
+      return new Intl.DateTimeFormat("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+      }).format(date);
     }
 
     function pickUnique(min, max, count) {
@@ -1300,635 +1306,28 @@
       return Math.floor(Math.random() * maxExclusive);
     }
 
-    function unlockPremium() {
-      const value = $("#premiumCode").value.trim().toLowerCase();
-
-      if (value !== PREMIUM_CODE) {
-        toast("Code Premium incorrect.");
-        return;
-      }
-
-      state.premium = true;
-      saveState();
-      applyPremiumState();
-      renderAll();
-      toast("Premium débloqué ✅");
-    }
-
-    function applyPremiumState() {
-      document.body.classList.toggle("premium", state.premium);
-    }
-
-    function saveCurrent() {
-      if (!currentGrid) {
-        toast("Génère d’abord une grille.");
-        return;
-      }
-
-      addFavorite(currentGrid);
-    }
-
-    function addFavorite(grid) {
-      const exists = state.favorites.some((fav) => signature(fav) === signature(grid));
-
-      if (exists) {
-        toast("Cette grille est déjà en favori.");
-        return;
-      }
-
-      state.favorites.unshift({
-        ...clone(grid),
-        favoriteId: makeId(),
-        savedAt: new Date().toISOString()
-      });
-
-      state.favorites = state.favorites.slice(0, 80);
-      saveState();
-      renderAll();
-      toast("Grille ajoutée aux favoris ⭐");
-    }
-
-    function copyCurrent() {
-      if (!currentGrid) {
-        toast("Aucune grille à copier.");
-        return;
-      }
-
-      copyText(gridText(currentGrid));
-    }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        toast("Copié.");
-      } catch {
-        toast(text);
-      }
-    }
-
-    function gridText(grid) {
-      const config = CONFIG[grid.game];
-      return `${config.label} — ${grid.main.join(" - ")} | ${config.extraLabel} : ${grid.extra.join(" - ")} | Aucun gain garanti.`;
-    }
-
-    function signature(grid) {
-      return `${grid.game}|${grid.main.join("-")}|${grid.extra.join("-")}`;
-    }
-
-    function checkResults() {
-      const config = CONFIG[game];
-      const main = parseNumberInput($("#resultMain").value, config.mainCount, config.mainMax);
-      const extra = parseNumberInput($("#resultExtra").value, config.extraCount, config.extraMax);
-
-      if (!main || !extra) {
-        toast(`Entre ${config.mainCount} numéros et ${config.extraCount} ${config.extraLabel.toLowerCase()}.`);
-        return;
-      }
-
-      const result = {
-        id: makeId(),
-        game,
-        main,
-        extra,
-        createdAt: new Date().toISOString()
-      };
-
-      state.results.unshift(result);
-      state.results = state.results.slice(0, 40);
-      saveState();
-
-      const grids = uniqueGrids([...state.favorites, ...state.history]).filter((grid) => grid.game === game);
-
-      if (!grids.length) {
-        $("#resultList").innerHTML = `<div class="empty">Aucune grille à contrôler.</div>`;
-        renderStats();
-        return;
-      }
-
-      $("#resultList").innerHTML = grids.slice(0, 30).map((grid) => resultHtml(grid, result)).join("");
-
-      renderStats();
-      renderPremiumStats();
-      toast("Résultats contrôlés.");
-    }
-
-    function parseNumberInput(value, count, max) {
-      const nums = value
-        .split(/[\s,;.-]+/)
-        .map((v) => Number(v.trim()))
-        .filter((n) => Number.isInteger(n));
-
-      const unique = Array.from(new Set(nums)).sort((a, b) => a - b);
-
-      if (unique.length !== count) return null;
-      if (unique.some((n) => n < 1 || n > max)) return null;
-
-      return unique;
-    }
-
-    function resultHtml(grid, result) {
-      const config = CONFIG[grid.game];
-      const mainMatch = grid.main.filter((n) => result.main.includes(n)).length;
-      const extraMatch = grid.extra.filter((n) => result.extra.includes(n)).length;
-      const possible = isPossibleWin(grid.game, mainMatch, extraMatch);
-
-      return `
-        <div class="item">
-          <div class="item-top">
-            <span>${config.icon} ${config.label} · ${grid.type === "premium" ? "Premium" : "Free"}</span>
-            <span class="result-status ${possible ? "win" : "lose"}">
-              ${possible ? "Gagné possible" : "Pas gagné indicatif"}
-            </span>
-          </div>
-
-          <div class="chip-row">
-            ${grid.main.map((n) => `<span class="chip">${n}</span>`).join("")}
-            ${grid.extra.map((n) => `<span class="chip hot">${n}</span>`).join("")}
-          </div>
-
-          <p class="notice">
-            Correspondance : ${mainMatch} numéro${mainMatch > 1 ? "s" : ""} + ${extraMatch} ${config.extraLabel.toLowerCase()}.
-            À vérifier sur ton reçu.
-          </p>
-        </div>
-      `;
-    }
-
-    function isPossibleWin(gridGame, mainMatch, extraMatch) {
-      if (gridGame === "euro") {
-        return mainMatch >= 2 || (mainMatch >= 1 && extraMatch === 2);
-      }
-
-      return mainMatch >= 2 || extraMatch >= 1;
-    }
-
-    function renderAll() {
-      renderHistory();
-      renderFavorites();
-      renderStats();
-      renderPremiumStats();
-      renderPwaStatus();
-    }
-
-    function renderHistory() {
-      const list = $("#historyList");
-      const items = state.history.filter((grid) => grid.game === game);
-
-      if (!items.length) {
-        list.innerHTML = `<div class="empty">Aucune grille générée.</div>`;
-        return;
-      }
-
-      list.innerHTML = items.slice(0, 12).map((grid) => gridItemHtml(grid, "history")).join("");
-      bindItemButtons();
-    }
-
-    function renderFavorites() {
-      const list = $("#favoritesList");
-      const items = state.favorites.filter((grid) => grid.game === game);
-
-      if (!items.length) {
-        list.innerHTML = `<div class="empty">Aucun favori.</div>`;
-        return;
-      }
-
-      list.innerHTML = items.map((grid) => gridItemHtml(grid, "favorite")).join("");
-      bindItemButtons();
-    }
-
-    function gridItemHtml(grid, type) {
-      const config = CONFIG[grid.game];
-      const id = type === "favorite" ? grid.favoriteId : grid.id;
-
-      return `
-        <div class="item">
-          <div class="item-top">
-            <span>${config.icon} ${config.label} · ${grid.type === "premium" ? "Premium" : "Free"}</span>
-            <span>${grid.score ? grid.score + "/99" : ""}</span>
-          </div>
-
-          <div class="chip-row">
-            ${grid.main.map((n) => `<span class="chip">${n}</span>`).join("")}
-            ${grid.extra.map((n) => `<span class="chip hot">${n}</span>`).join("")}
-          </div>
-
-          <div class="item-actions">
-            <button class="small-btn" data-copy="${id}" data-type="${type}">Copier</button>
-            ${
-              type === "history"
-                ? `<button class="small-btn" data-fav="${id}">Favori</button>`
-                : `<button class="small-btn danger" data-del="${id}">Supprimer</button>`
-            }
-          </div>
-        </div>
-      `;
-    }
-
-    function bindItemButtons() {
-      $$("[data-copy]").forEach((button) => {
-        button.onclick = () => {
-          const grid = findGrid(button.dataset.copy, button.dataset.type);
-          if (grid) copyText(gridText(grid));
-        };
-      });
-
-      $$("[data-fav]").forEach((button) => {
-        button.onclick = () => {
-          const grid = findGrid(button.dataset.fav, "history");
-          if (grid) addFavorite(grid);
-        };
-      });
-
-      $$("[data-del]").forEach((button) => {
-        button.onclick = () => {
-          state.favorites = state.favorites.filter((grid) => grid.favoriteId !== button.dataset.del);
-          saveState();
-          renderAll();
-          toast("Favori supprimé.");
-        };
-      });
-    }
-
-    function findGrid(id, type) {
-      if (type === "favorite") {
-        return state.favorites.find((grid) => grid.favoriteId === id);
-      }
-
-      return state.history.find((grid) => grid.id === id);
-    }
-
-    function clearFavorites() {
-      if (!state.favorites.length) {
-        toast("Aucun favori à supprimer.");
-        return;
-      }
-
-      if (!confirm("Supprimer tous les favoris ?")) return;
-
-      state.favorites = [];
-      saveState();
-      renderAll();
-      toast("Favoris supprimés.");
-    }
-
-    function exportFavorites() {
-      const items = state.favorites.filter((grid) => grid.game === game);
-
-      if (!items.length) {
-        toast("Aucun favori à exporter.");
-        return;
-      }
-
-      const content = [
-        "GALACTIC LOTTERY — FAVORIS",
-        "Application indépendante. Aucun gain garanti.",
-        "",
-        ...items.map(gridText)
-      ].join("\n");
-
-      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = "galactic-lottery-favoris.txt";
-      link.click();
-
-      URL.revokeObjectURL(url);
-      toast("Export généré.");
-    }
-
-    function buildProfile(profileGame) {
-      const config = CONFIG[profileGame];
-      const counts = new Map();
-
-      for (let i = 1; i <= config.mainMax; i++) {
-        counts.set(i, 0);
-      }
-
-      const sourceResults = state.results.filter((result) => result.game === profileGame);
-      const sourceGrids = uniqueGrids([...state.history, ...state.favorites]).filter((grid) => grid.game === profileGame);
-
-      const source = sourceResults.length
-        ? sourceResults.map((result) => result.main)
-        : sourceGrids.map((grid) => grid.main);
-
-      source.forEach((numbers) => {
-        numbers.forEach((n) => counts.set(n, (counts.get(n) || 0) + 1));
-      });
-
-      const sortedHot = Array.from(counts.entries())
-        .sort((a, b) => b[1] - a[1] || a[0] - b[0])
-        .slice(0, 10)
-        .map(([n]) => n);
-
-      const sortedCold = Array.from(counts.entries())
-        .sort((a, b) => a[1] - b[1] || a[0] - b[0])
-        .slice(0, 10)
-        .map(([n]) => n);
-
-      return {
-        hot: sortedHot,
-        cold: sortedCold,
-        hasData: source.length > 0,
-        sourceType: sourceResults.length ? "résultats saisis" : "historique local"
-      };
-    }
-
-    function renderStats() {
-      const profile = buildProfile(game);
-
-      $("#hotNumbers").innerHTML = profile.hasData
-        ? profile.hot.map((n) => `<span class="chip hot">${n}</span>`).join("")
-        : `<span class="chip">?</span>`;
-
-      $("#coldNumbers").innerHTML = profile.hasData
-        ? profile.cold.map((n) => `<span class="chip cold">${n}</span>`).join("")
-        : `<span class="chip">?</span>`;
-
-      $("#statsSource").textContent = profile.hasData
-        ? `Calcul basé sur tes ${profile.sourceType}. Ces données restent locales et indicatives.`
-        : "Pas encore assez de données. Génère des grilles ou saisis des résultats pour créer les profils chaud/froid.";
-    }
-
-    function renderPremiumStats() {
-      const wrap = $("#premiumStats");
-      const profile = buildProfile(game);
-
-      if (!state.premium) return;
-
-      const grids = uniqueGrids([...state.history, ...state.favorites]).filter((grid) => grid.game === game);
-      const latest = currentGrid || grids[0];
-
-      if (!latest) {
-        wrap.innerHTML = `
-          <div class="stat-box">
-            <small>Analyse Premium</small>
-            <p class="notice" style="margin-top:0;">Génère une grille pour voir le score statistique.</p>
-          </div>
-        `;
-        return;
-      }
-
-      const odd = latest.main.filter((n) => n % 2 !== 0).length;
-      const low = latest.main.filter((n) => n <= Math.floor(CONFIG[game].mainMax / 2)).length;
-      const sum = latest.main.reduce((a, b) => a + b, 0);
-      const score = latest.score || scoreGrid(latest.main, latest.extra).score;
-
-      wrap.innerHTML = `
-        <div class="stat-box">
-          <small>Score statistique interne</small>
-          <div class="chip-row"><span class="chip hot">${score}/99</span></div>
-        </div>
-
-        <div class="stat-box">
-          <small>Pair / impair</small>
-          <div class="chip-row">
-            <span class="chip">${5 - odd} pairs</span>
-            <span class="chip">${odd} impairs</span>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <small>Petits / grands</small>
-          <div class="chip-row">
-            <span class="chip">${low} petits</span>
-            <span class="chip">${5 - low} grands</span>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <small>Somme de grille</small>
-          <div class="chip-row"><span class="chip">${sum}</span></div>
-        </div>
-
-        <div class="stat-box">
-          <small>Base chaud/froid</small>
-          <p class="notice" style="margin-top:0;">
-            ${profile.hasData ? "Profil actif basé sur " + profile.sourceType + "." : "Pas assez de données réelles pour un profil solide."}
-          </p>
-        </div>
-      `;
-    }
-
-    function uniqueGrids(grids) {
-      const seen = new Set();
-      const out = [];
-
-      grids.forEach((grid) => {
-        const sig = signature(grid);
-        if (seen.has(sig)) return;
-        seen.add(sig);
-        out.push(grid);
-      });
-
-      return out;
-    }
-
-    function getNextDrawDate() {
-      const config = CONFIG[game];
-      const custom = state.customDraws[game];
-
-      if (custom && new Date(custom).getTime() > Date.now()) {
-        return new Date(custom);
-      }
-
-      const now = new Date();
-
-      for (let add = 0; add <= 10; add++) {
-        const date = new Date(now);
-        date.setDate(now.getDate() + add);
-        date.setHours(config.hour, config.minute, 0, 0);
-
-        if (config.drawDays.includes(date.getDay()) && date.getTime() > now.getTime()) {
-          return date;
-        }
-      }
-
-      const fallback = new Date(now);
-      fallback.setDate(now.getDate() + 1);
-      fallback.setHours(config.hour, config.minute, 0, 0);
-      return fallback;
-    }
-
-    function startTimer() {
-      updateTimer();
-      setInterval(updateTimer, 1000);
-    }
-
-    function updateTimer() {
-      const drawDate = getNextDrawDate();
-      const diff = drawDate.getTime() - Date.now();
-
-      if (diff <= 0) {
-        $("#countdown").textContent = "00:00:00";
-        $("#nextDrawText").textContent = "Tirage proche ou terminé. Vérifie la source officielle.";
-        return;
-      }
-
-      $("#countdown").textContent = durationText(diff);
-      $("#nextDrawText").textContent = `Prochain tirage indicatif : ${formatDate(drawDate.toISOString())}`;
-    }
-
-    function durationText(ms) {
-      const total = Math.floor(ms / 1000);
-      const days = Math.floor(total / 86400);
-      const hours = Math.floor((total % 86400) / 3600);
-      const minutes = Math.floor((total % 3600) / 60);
-      const seconds = total % 60;
-
-      if (days > 0) {
-        return `${days}j ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-      }
-
-      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-    }
-
-    function setDrawInput() {
-      $("#drawInput").value = toDateTimeLocal(getNextDrawDate());
-    }
-
-    function saveCustomDraw() {
-      const value = $("#drawInput").value;
-
-      if (!value) {
-        toast("Choisis une date.");
-        return;
-      }
-
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) {
-        toast("Date invalide.");
-        return;
-      }
-
-      state.customDraws[game] = date.toISOString();
-      saveState();
-      updateTimer();
-      toast("Timer enregistré.");
-    }
-
-    function resetCustomDraw() {
-      delete state.customDraws[game];
-      saveState();
-      setDrawInput();
-      updateTimer();
-      toast("Timer remis en automatique.");
-    }
-
-    function registerServiceWorker() {
-      if (!("serviceWorker" in navigator)) {
-        $("#pwaStatus").textContent = "Service Worker non compatible.";
-        return;
-      }
-
-      window.addEventListener("load", async () => {
-        try {
-          await navigator.serviceWorker.register("/sw.js");
-          renderPwaStatus();
-        } catch {
-          $("#pwaStatus").textContent = "Service Worker non actif. Vérifie sw.js.";
-        }
-      });
-    }
-
-    function initInstallPrompt() {
-      window.addEventListener("beforeinstallprompt", (event) => {
-        event.preventDefault();
-        deferredInstallPrompt = event;
-        renderPwaStatus();
-      });
-
-      window.addEventListener("appinstalled", () => {
-        deferredInstallPrompt = null;
-        toast("Application installée.");
-        renderPwaStatus();
-      });
-    }
-
-    async function installApp() {
-      if (deferredInstallPrompt) {
-        deferredInstallPrompt.prompt();
-        await deferredInstallPrompt.userChoice;
-        deferredInstallPrompt = null;
-        renderPwaStatus();
-        return;
-      }
-
-      toast("Si rien ne s’ouvre : menu du navigateur → Ajouter à l’écran d’accueil.");
-    }
-
-    function renderPwaStatus() {
-      const standalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        navigator.standalone === true;
-
-      if (standalone) {
-        $("#pwaStatus").textContent = `Application installée en mode PWA. Version ${APP_VERSION}.`;
-        return;
-      }
-
-      if (deferredInstallPrompt) {
-        $("#pwaStatus").textContent = "Installation disponible : appuie sur Installer.";
-        return;
-      }
-
-      $("#pwaStatus").textContent = "Sur Android : menu du navigateur → Ajouter à l’écran d’accueil. Le bouton apparaît selon le navigateur.";
-    }
-
     function makeId() {
-      if (window.crypto && window.crypto.randomUUID) {
-        return window.crypto.randomUUID();
-      }
-
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
       return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
-    }
-
-    function clone(value) {
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     function pad(n) {
       return String(n).padStart(2, "0");
     }
 
-    function formatDate(value) {
-      try {
-        return new Intl.DateTimeFormat("fr-FR", {
-          dateStyle: "medium",
-          timeStyle: "short"
-        }).format(new Date(value));
-      } catch {
-        return "À vérifier";
-      }
-    }
-
-    function toDateTimeLocal(date) {
-      const offset = date.getTimezoneOffset();
-      const local = new Date(date.getTime() - offset * 60000);
-      return local.toISOString().slice(0, 16);
-    }
-
-    function scrollToId(id) {
-      const target = document.getElementById(id);
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
     let toastTimer = null;
-
-    function toast(message) {
-      $("#toast").textContent = message;
+    function toast(msg) {
+      $("#toast").textContent = msg;
       $("#toast").classList.add("show");
-
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        $("#toast").classList.remove("show");
-      }, 2800);
+      toastTimer = setTimeout(() => $("#toast").classList.remove("show"), 2400);
+    }
+
+    function registerSW() {
+      if (!("serviceWorker" in navigator)) return;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
     }
   </script>
 </body>
